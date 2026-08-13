@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vexora — Beta</title>
+  <meta name="description" content="Download the Vexora Beta and contribute to the project. Live translation overlay for games.">
+
+  <!-- Favicon (inline SVG placeholder — geometric V in brand green) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B0D12'/%3E%3Cpath d='M8 9l8 14 8-14' stroke='%232FAE7A' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/beta.css">
+</head>
+<body>
+
+  <!-- ========== HEADER ========== -->
+  <header class="header" id="header">
+    <a href="../index.html" class="header__logo">
+      <span class="header__logo-icon-wrap">
+        <img src="../assets/images/logo.png" alt="Vexora V logo" class="header__logo-icon">
+      </span>
+      <span class="header__logo-text">Vexora</span>
+    </a>
+    <div class="header__right">
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <!-- Sun icon (shown in light theme) -->
+        <svg class="theme-toggle__sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon (shown in dark theme) -->
+        <svg class="theme-toggle__moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="../index.html#demo" class="header__cta" id="header-demo-btn">See It In Action</a>
+    </div>
+  </header>
+
+  <!-- ========== BETA MAIN CONTENT ========== -->
+  <main class="beta-main">
+    <img src="../assets/images/speech.svg" alt="Vexora Beta" class="beta-speech-img">
+
+    <div class="beta-links">
+
+      <!-- Box 1: Download Beta -->
+      <div class="beta-link-box">
+        <div class="beta-link-box__title">DOWNLOAD BETA &amp; CONTRIBUTE</div>
+        <div class="beta-link-box__row">
+          <span class="beta-link-box__url">https://github.com/Noxie-Labs/Vexora-app</span>
+          <button class="beta-link-box__copy-btn beta-link-box__copy-btn--blue" onclick="copyToClipboard('https://github.com/Noxie-Labs/Vexora-app', this)" id="copy-github">Copy</button>
+        </div>
+      </div>
+
+      <!-- Box 2: Buy Me a Pizza -->
+      <div class="beta-link-box">
+        <div class="beta-link-box__title">🍕 BUY ME A PIZZA (MONOBANK/APPLE PAY)</div>
+        <div class="beta-link-box__row">
+          <span class="beta-link-box__url">https://send.monobank.ua/jar/5jRdB78TKa</span>
+          <button class="beta-link-box__copy-btn beta-link-box__copy-btn--orange" onclick="copyToClipboard('https://send.monobank.ua/jar/5jRdB78TKa', this)" id="copy-monobank">Copy</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========== VALIDATION / INTEREST CHECK ========== -->
+    <div class="beta-validation">
+      <h3 class="beta-validation__heading">A quick note on development 🚀</h3>
+      <p class="beta-validation__body">Honestly, I haven't finished fully building Vexora yet. Before I pour all my time and energy into finishing it, I need to know if people actually want this. If you're interested and want to see this come to life, leave your email below! Once we reach at least 10 interested people, I'll hit the gas and complete the build.</p>
+
+      <div id="beta-email-form-wrap">
+        <form class="cta__email-form" id="beta-email-form" novalidate>
+          <input class="cta__email-input" type="email" name="email" placeholder="you@email.com" required autocomplete="email">
+          <button class="cta__email-btn" type="submit">Join Waitlist</button>
+        </form>
+        <p class="cta__email-hint">We'll only email you when Vexora is ready to launch.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer" id="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">Vexora</div>
+      <div class="footer__links">
+        <span class="footer__copy">Vexora © 2026</span>
+        <a href="./privacy.html" class="footer__link">Privacy</a>
+        <a href="./terms.html" class="footer__link">Terms</a>
+        <a href="https://tally.so/r/rjQXMv" class="footer__link" id="footer-feedback" target="_blank" rel="noopener">Got feedback?</a>
+
+        <!-- Follow popup -->
+        <div class="footer__follow-wrap">
+          <button class="footer__follow-btn" id="follow-btn">
+            Follow
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="footer__popup" id="follow-popup">
+            <!-- Twitter/X -->
+            <a href="https://x.com/noxielabs" class="footer__popup-link" id="social-twitter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.054 10.054 0 01-3.127 1.195 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+              Twitter (X)
+            </a>
+            <!-- Telegram -->
+            <a href="https://t.me/noxielabs" class="footer__popup-link" id="social-telegram" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              Telegram
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== SCRIPTS ========== -->
+  <script>
+    /* --- Theme toggle --- */
+    (function() {
+      const toggle = document.getElementById('theme-toggle');
+      const html = document.documentElement;
+      const saved = localStorage.getItem('vexora-theme');
+      if (saved) html.setAttribute('data-theme', saved);
+      toggle.addEventListener('click', () => {
+        const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('vexora-theme', next);
+      });
+    })();
+
+    /* --- Header scroll effect --- */
+    (function() {
+      const header = document.getElementById('header');
+      window.addEventListener('scroll', () => {
+        header.classList.toggle('scrolled', window.scrollY > 20);
+      });
+    })();
+
+    /* --- Footer Follow popup --- */
+    (function() {
+      const btn = document.getElementById('follow-btn');
+      const popup = document.getElementById('follow-popup');
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        btn.classList.toggle('open');
+        popup.classList.toggle('open');
+      });
+      document.addEventListener('click', () => {
+        btn.classList.remove('open');
+        popup.classList.remove('open');
+      });
+    })();
+
+    /* --- Copy to clipboard --- */
+    /* --- Email waitlist form --- */
+    (function() {
+      const EMAIL_ENDPOINT = 'https://app.loops.so/api/newsletter-form/cmslrspyg0m100j4dcmnsko24';
+      const form = document.getElementById('beta-email-form');
+      const wrap = document.getElementById('beta-email-form-wrap');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const input = form.querySelector('input[name="email"]');
+        const email = input.value.trim();
+
+        if (!email || !input.checkValidity()) {
+          input.focus();
+          return;
+        }
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
+
+        if (EMAIL_ENDPOINT && EMAIL_ENDPOINT.trim() !== '') {
+          try {
+            const formData = new URLSearchParams();
+            formData.append('email', email);
+
+            const response = await fetch(EMAIL_ENDPOINT, {
+              method: 'POST',
+              body: formData,
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+            });
+
+            if (response.ok) {
+              wrap.innerHTML = '<p class="cta__email-success">Thanks — we\'ll email you when it\'s live. 🎉</p>';
+            } else {
+              throw new Error('Network response was not ok.');
+            }
+          } catch (error) {
+            console.error('Error submitting email:', error);
+            submitBtn.textContent = 'Error. Try again';
+            submitBtn.disabled = false;
+            setTimeout(() => {
+              submitBtn.textContent = originalBtnText;
+            }, 3000);
+          }
+        } else {
+          console.log('Form submission simulated. Endpoint not configured.');
+          setTimeout(() => {
+            wrap.innerHTML = '<p class="cta__email-success">Thanks — we\'ll email you when it\'s live. 🎉</p>';
+          }, 500);
+        }
+      });
+    })();
+
+    function copyToClipboard(text, btnElement) {
+      const originalText = btnElement.textContent;
+      const originalBg = btnElement.style.backgroundColor || window.getComputedStyle(btnElement).backgroundColor;
+
+      navigator.clipboard.writeText(text).then(() => {
+        btnElement.textContent = 'Copied! ✔';
+        btnElement.style.backgroundColor = '#2FAE7A';
+
+        setTimeout(() => {
+          btnElement.textContent = originalText;
+          btnElement.style.backgroundColor = '';
+        }, 2000);
+      }).catch(() => {
+        // Fallback for older browsers
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+
+        btnElement.textContent = 'Copied! ✔';
+        btnElement.style.backgroundColor = '#2FAE7A';
+
+        setTimeout(() => {
+          btnElement.textContent = originalText;
+          btnElement.style.backgroundColor = '';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
