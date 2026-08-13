@@ -1,0 +1,4285 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vexora — Live Game Translation & AI Screen Assistant</title>
+  <meta name="description" content="Live translation appears right over your screen. No downloads. No tab-switching. No waiting on a fan patch that's never coming.">
+
+  <!-- Open Graph (Discord / Reddit / Telegram share cards) -->
+  <meta property="og:title" content="Vexora — Live Game Translation & AI Screen Assistant">
+  <meta property="og:description" content="Live translation overlay for games. One hotkey, zero tab-switching. Works on Windows & Mac.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://noxielabs.space/vexora/">
+  <meta property="og:image" content="">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Vexora — Live Game Translation & AI Screen Assistant">
+  <meta name="twitter:description" content="Live translation overlay for games. One hotkey, zero tab-switching.">
+  <meta name="twitter:image" content="">
+
+  <!-- Favicon (inline SVG placeholder — geometric V in brand green) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B0D12'/%3E%3Cpath d='M8 9l8 14 8-14' stroke='%232FAE7A' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* =============================================
+       DESIGN TOKENS — from design-brief.md
+       ============================================= */
+
+    :root {
+      /* Typography */
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+      /* Accent colours (shared across themes) */
+      --color-green: #2FAE7A;
+      --color-green-hover: #28996c;
+      --color-violet: #6D5DFC;
+      --color-blue: #4F8EF7;
+      --color-orange: #F0975A;
+
+      /* Spacing scale */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --space-3xl: 64px;
+      --space-4xl: 80px;
+      --space-5xl: 100px;
+
+      /* Border radius */
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+      --radius-full: 9999px;
+
+      /* Layout */
+      --header-height: 72px;
+      --content-max-width: 1080px;
+      --content-narrow: 800px;
+      --content-narrowest: 680px;
+
+      /* Transitions */
+      --transition-fast: 150ms ease;
+      --transition-base: 250ms ease;
+      --transition-slow: 400ms ease;
+    }
+
+    /* ----- DARK THEME (default) ----- */
+    [data-theme="dark"] {
+      --bg-primary: #0B0D12;
+      --bg-secondary: #0E1016;
+      --surface: #15171F;
+      --surface-hover: #1A1D26;
+      --surface-border: rgba(255, 255, 255, 0.06);
+
+      --text-primary: #F0F0F0;
+      --text-secondary: rgba(240, 240, 240, 0.75);
+      --text-tertiary: rgba(240, 240, 240, 0.6);
+      --text-muted: rgba(240, 240, 240, 0.5);
+      --text-faint: rgba(240, 240, 240, 0.4);
+
+      --header-bg: rgba(11, 13, 18, 0.7);
+      --header-bg-scrolled: rgba(11, 13, 18, 0.95);
+      --toggle-hover: rgba(255, 255, 255, 0.06);
+
+      --footer-border: rgba(255, 255, 255, 0.06);
+
+      --btn-primary-bg: var(--color-green);
+      --btn-primary-text: #ffffff;
+      --btn-secondary-border: rgba(255, 255, 255, 0.15);
+      --btn-secondary-text: var(--text-primary);
+    }
+
+    /* ----- LIGHT THEME ----- */
+    [data-theme="light"] {
+      --bg-primary: #FAFAF8;
+      --bg-secondary: #F7F7F5;
+      --surface: #FFFFFF;
+      --surface-hover: #F5F5F3;
+      --surface-border: rgba(0, 0, 0, 0.08);
+
+      --text-primary: #1A1A1A;
+      --text-secondary: rgba(26, 26, 26, 0.75);
+      --text-tertiary: rgba(26, 26, 26, 0.6);
+      --text-muted: rgba(26, 26, 26, 0.5);
+      --text-faint: rgba(26, 26, 26, 0.4);
+
+      --header-bg: rgba(250, 250, 248, 0.7);
+      --header-bg-scrolled: rgba(250, 250, 248, 0.95);
+      --toggle-hover: rgba(0, 0, 0, 0.04);
+
+      --footer-border: rgba(0, 0, 0, 0.08);
+
+      --btn-primary-bg: var(--color-green);
+      --btn-primary-text: #ffffff;
+      --btn-secondary-border: rgba(0, 0, 0, 0.15);
+      --btn-secondary-text: var(--text-primary);
+    }
+
+    /* =============================================
+       RESET & BASE
+       ============================================= */
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-family);
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background-color: var(--bg-primary);
+      transition: background-color var(--transition-base), color var(--transition-base);
+      overflow-x: hidden;
+    }
+
+    /* =============================================
+       LAYOUT GRID
+       ============================================= */
+
+    .container {
+      width: 100%;
+      max-width: var(--content-max-width);
+      margin: 0 auto;
+      padding: 0 var(--space-xl);
+    }
+
+    .container--narrow {
+      max-width: var(--content-narrow);
+    }
+
+    .container--narrowest {
+      max-width: var(--content-narrowest);
+    }
+
+    .container--cta {
+      max-width: 600px;
+    }
+
+    /* =============================================
+       HEADER
+       ============================================= */
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: var(--header-height);
+      padding: 0 var(--space-xl);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--header-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--surface-border);
+      transition: background var(--transition-base);
+    }
+
+    .header.scrolled {
+      background: var(--header-bg-scrolled);
+    }
+
+    .header__logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .header__logo-icon-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(47, 174, 122, 0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(47, 174, 122, 0.18);
+      overflow: hidden;
+      transition: background var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
+    }
+
+    .header__logo:hover .header__logo-icon-wrap {
+      background: rgba(47, 174, 122, 0.18);
+      border-color: rgba(47, 174, 122, 0.3);
+      transform: scale(1.05);
+    }
+
+    .header__logo-icon {
+      width: 100%;
+      height: 100%;
+      padding: 4px;
+      box-sizing: border-box;
+      object-fit: contain;
+    }
+
+    .header__logo-text {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      transition: color var(--transition-base);
+    }
+
+    [data-theme="light"] .header__logo-icon-wrap {
+      background: rgba(47, 174, 122, 0.1);
+      border-color: rgba(47, 174, 122, 0.2);
+    }
+
+    .header__right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    /* Theme toggle button */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: var(--space-sm);
+      transition: background var(--transition-fast);
+    }
+
+    .theme-toggle:hover {
+      background: var(--toggle-hover);
+    }
+
+    .theme-toggle svg {
+      width: 20px;
+      height: 20px;
+      transition: transform var(--transition-base);
+    }
+
+    .theme-toggle:hover svg {
+      transform: rotate(15deg);
+    }
+
+    /* Sun icon hidden in dark, moon hidden in light */
+    [data-theme="dark"] .theme-toggle__sun { display: none; }
+    [data-theme="dark"] .theme-toggle__moon { display: block; }
+    [data-theme="light"] .theme-toggle__sun { display: block; }
+    [data-theme="light"] .theme-toggle__moon { display: none; }
+
+    /* Header CTA */
+    .header__cta {
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: filter var(--transition-fast), transform var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .header__cta:hover {
+      filter: brightness(0.92);
+      transform: translateY(-1px);
+    }
+
+    .header__cta:active {
+      transform: translateY(0);
+    }
+
+    /* =============================================
+       SECTIONS — SKELETON CONTAINERS
+       ============================================= */
+
+    .section {
+      width: 100%;
+      transition: background-color var(--transition-base);
+    }
+
+    /* Section dev outline — remove when adding content */
+    .section__placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      border: 1px dashed var(--surface-border);
+      border-radius: var(--radius-xl);
+      margin: var(--space-lg) 0;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* =============================================
+       HERO
+       ============================================= */
+
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      padding-top: var(--header-height);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Geometric background shapes */
+    .hero__bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      will-change: transform;
+    }
+
+    .hero__shape {
+      position: absolute;
+      border-radius: 50%;
+      will-change: transform;
+    }
+
+    /* Shape 1 — large green circle, top-right */
+    .hero__shape--1 {
+      width: 420px;
+      height: 420px;
+      top: -60px;
+      right: -80px;
+      background: var(--color-green);
+      opacity: 0.14;
+      filter: blur(60px);
+    }
+
+    /* Shape 2 — medium violet polygon, top-right offset */
+    .hero__shape--2 {
+      width: 280px;
+      height: 280px;
+      top: 80px;
+      right: 15%;
+      background: var(--color-violet);
+      opacity: 0.12;
+      filter: blur(50px);
+      border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    }
+
+    /* Shape 3 — large green-blue, bottom-left */
+    .hero__shape--3 {
+      width: 360px;
+      height: 360px;
+      bottom: -40px;
+      left: -100px;
+      background: var(--color-green);
+      opacity: 0.16;
+      filter: blur(55px);
+      border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%;
+    }
+
+    /* Shape 4 — small violet accent, bottom-left offset */
+    .hero__shape--4 {
+      width: 200px;
+      height: 200px;
+      bottom: 120px;
+      left: 12%;
+      background: var(--color-violet);
+      opacity: 0.18;
+      filter: blur(45px);
+    }
+
+    /* Hero content */
+    .hero__content {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 8vh; /* Adds breathing room below the fixed header */
+    }
+
+    .hero__title {
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .hero__subtitle {
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin-top: 20px;
+    }
+
+    .hero__cta-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero__cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: var(--font-family);
+      color: var(--btn-primary-text);
+      background: var(--btn-primary-bg);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: filter var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .hero__cta:hover {
+      filter: brightness(0.92);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(47, 174, 122, 0.2);
+    }
+
+    .hero__cta:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .hero__cta--secondary {
+      background: transparent;
+      color: var(--btn-secondary-text);
+      border: 1px solid var(--btn-secondary-border);
+    }
+
+    .hero__cta--secondary:hover {
+      filter: none;
+      border-color: var(--color-green);
+      color: var(--color-green);
+      box-shadow: 0 4px 16px rgba(47, 174, 122, 0.1);
+    }
+
+    .hero__micro {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* =============================================
+       PAIN BLOCK
+       ============================================= */
+
+    #pain {
+      padding: var(--space-4xl) 0;
+    }
+
+    .pain__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+      max-width: var(--content-max-width);
+    }
+
+    .pain-card {
+      padding: var(--space-xl);
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      transition: background var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
+    }
+
+    .pain-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(47, 174, 122, 0.15);
+    }
+
+    .pain-card__icon {
+      width: 32px;
+      height: 32px;
+      color: var(--color-green);
+      opacity: 0.85;
+    }
+
+    .pain-card__title {
+      margin-top: var(--space-md);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .pain-card__text {
+      margin-top: var(--space-sm);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    /* =============================================
+       INTERACTIVE DEMO
+       ============================================= */
+
+    #demo {
+      padding: var(--space-4xl) 0;
+    }
+
+    .demo__header {
+      text-align: center;
+      margin-bottom: var(--space-xl);
+    }
+
+    .demo__title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Pill-shaped tab group */
+    .demo__tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--space-xl);
+    }
+
+    .demo__tab-group {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      border-radius: var(--radius-full);
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+    }
+
+    .demo__tab {
+      padding: 10px 24px;
+      border: none;
+      border-radius: var(--radius-full);
+      background: transparent;
+      font-family: var(--font-family);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .demo__tab:hover {
+      color: var(--text-primary);
+    }
+
+    .demo__tab.active {
+      background: var(--color-green);
+      color: #fff;
+    }
+
+    /* Demo scene container */
+    .demo__scene-wrap {
+      position: relative;
+      border-radius: var(--radius-2xl);
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: var(--space-2xl);
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: background var(--transition-base), border-color var(--transition-base);
+    }
+
+    .demo__label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: var(--space-lg);
+    }
+
+    /* Individual scene panels */
+    .demo__scene {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .demo__scene.active {
+      display: flex;
+    }
+
+    /* Geometric dialogue frame */
+    .demo__geo-frame {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      min-height: 200px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-primary);
+      border: 1px solid var(--surface-border);
+      padding: var(--space-xl);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      transition: background var(--transition-base), border-color var(--transition-base);
+    }
+
+    /* Decorative geometric corner accents for frame */
+    .demo__geo-frame::before,
+    .demo__geo-frame::after {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      opacity: 0.08;
+      border-radius: 30% 70% 50% 50%;
+    }
+
+    .demo__geo-frame::before {
+      top: -12px;
+      left: -12px;
+      background: var(--color-green);
+      filter: blur(8px);
+    }
+
+    .demo__geo-frame::after {
+      bottom: -12px;
+      right: -12px;
+      background: var(--color-violet);
+      filter: blur(8px);
+    }
+
+    /* --- Translate scene --- */
+    .translate__speaker {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+      align-self: flex-start;
+    }
+
+    .translate__avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, var(--color-violet) 0%, var(--color-blue) 100%);
+      opacity: 0.7;
+    }
+
+    .translate__speaker-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      letter-spacing: 0.5px;
+    }
+
+    .translate__text-line {
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: var(--text-primary);
+      text-align: left;
+      width: 100%;
+      min-height: 70px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+    }
+
+    .translate__char {
+      display: inline-block;
+      transition: all 0.35s ease;
+      position: relative;
+    }
+
+    .translate__char.morphing {
+      filter: blur(4px);
+      opacity: 0;
+      transform: translateY(4px);
+    }
+
+    .translate__char.revealed {
+      filter: blur(0);
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* --- Extract scene --- */
+    .extract__lines {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      position: relative;
+    }
+
+    .extract__line {
+      height: 14px;
+      border-radius: 4px;
+      background: var(--text-muted);
+      opacity: 0.15;
+      transition: all 0.3s ease;
+    }
+
+    .extract__line:nth-child(1) { width: 90%; }
+    .extract__line:nth-child(2) { width: 75%; }
+    .extract__line:nth-child(3) { width: 85%; }
+    .extract__line:nth-child(4) { width: 60%; }
+    .extract__line:nth-child(5) { width: 70%; }
+    .extract__line:nth-child(6) { width: 50%; }
+
+    .extract__line.selected {
+      background: var(--color-green);
+      opacity: 0.35;
+    }
+
+    .extract__selection {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border: 2px solid var(--color-green);
+      border-radius: var(--radius-md);
+      background: rgba(47, 174, 122, 0.06);
+      opacity: 0;
+      transform: scale(0.97);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+    }
+
+    .extract__selection.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Toast */
+    .demo__toast {
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      background: var(--color-green);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .demo__toast.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .demo__toast svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* --- Assist scene --- */
+    .assist__blocks {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .assist__block {
+      aspect-ratio: 1;
+      border-radius: var(--radius-md);
+      transition: all 0.5s ease;
+    }
+
+    .assist__block:nth-child(1) {
+      background: var(--color-violet);
+      opacity: 0.25;
+    }
+    .assist__block:nth-child(2) {
+      background: var(--color-green);
+      opacity: 0.2;
+      border-radius: 50%;
+    }
+    .assist__block:nth-child(3) {
+      background: var(--color-blue);
+      opacity: 0.18;
+    }
+    .assist__block:nth-child(4) {
+      background: var(--color-green);
+      opacity: 0.15;
+      border-radius: 50%;
+    }
+    .assist__block:nth-child(5) {
+      background: var(--color-orange);
+      opacity: 0.22;
+    }
+    .assist__block:nth-child(6) {
+      background: var(--color-violet);
+      opacity: 0.18;
+      border-radius: 50%;
+    }
+
+    /* Glitch state */
+    .assist__block.glitched:nth-child(1) { transform: translate(8px, -6px) rotate(12deg); }
+    .assist__block.glitched:nth-child(2) { transform: translate(-10px, 5px) scale(0.85); }
+    .assist__block.glitched:nth-child(3) { transform: translate(5px, 10px) rotate(-8deg); }
+    .assist__block.glitched:nth-child(4) { transform: translate(-7px, -8px) rotate(15deg); }
+    .assist__block.glitched:nth-child(5) { transform: translate(12px, 4px) scale(1.1); }
+    .assist__block.glitched:nth-child(6) { transform: translate(-5px, 7px) rotate(-12deg); }
+
+    /* Fixed state */
+    .assist__block.fixed {
+      transform: translate(0, 0) rotate(0deg) scale(1) !important;
+    }
+
+    @keyframes glitch-flicker {
+      0%, 100% { opacity: 0.2; }
+      20% { opacity: 0.35; }
+      40% { opacity: 0.12; }
+      60% { opacity: 0.3; }
+      80% { opacity: 0.15; }
+    }
+
+    .assist__block.glitched {
+      animation: glitch-flicker 1.2s ease-in-out infinite;
+    }
+
+    .assist__result {
+      margin-top: var(--space-md);
+      font-size: 15px;
+      color: var(--color-green);
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease 0.3s, transform 0.4s ease 0.3s;
+    }
+
+    .assist__result.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Hotkey button */
+    .demo__hotkey {
+      margin-top: var(--space-lg);
+      padding: 12px 28px;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 3px 0 var(--surface-border);
+      transition: all var(--transition-fast);
+      position: relative;
+      user-select: none;
+    }
+
+    .demo__hotkey:hover {
+      border-color: var(--color-green);
+      box-shadow: 0 3px 0 var(--color-green);
+    }
+
+    .demo__hotkey:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--surface-border);
+    }
+
+    .demo__hotkey .mobile-label { display: none; }
+    .demo__hotkey .desktop-label { display: inline; }
+
+    /* Demo caption */
+    .demo__caption {
+      margin-top: var(--space-md);
+      font-size: 14px;
+      color: var(--text-tertiary);
+      text-align: center;
+      min-height: 20px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .demo__caption.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* --- Drag-to-select (Extract & Assist scenes) --- */
+    .demo__geo-frame--draggable {
+      cursor: crosshair;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+
+    .demo__select-rect {
+      position: absolute;
+      border: 2px dashed var(--color-green);
+      background: rgba(47, 174, 122, 0.08);
+      border-radius: 3px;
+      pointer-events: none;
+      z-index: 5;
+      display: none;
+    }
+
+    .demo__select-rect.active {
+      display: block;
+    }
+
+    .demo__drag-hint {
+      margin-top: var(--space-lg);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: var(--text-muted);
+      user-select: none;
+      transition: opacity var(--transition-fast);
+    }
+
+    .demo__drag-hint .mobile-label { display: none; }
+    .demo__drag-hint .desktop-label { display: inline; }
+
+    .demo__drag-hint svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0.6;
+    }
+
+    .demo__drag-hint.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* =============================================
+       FULL-SCREEN DEMO OVERLAY
+       ============================================= */
+    .demo-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0.45s;
+    }
+
+    .demo-overlay.open {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0s;
+    }
+
+    /* Overlay header bar */
+    .demo-overlay__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--surface-border);
+      flex-shrink: 0;
+    }
+
+    .demo-overlay__progress {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .demo-overlay__step {
+      width: 32px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--surface-border);
+      transition: background 0.4s ease;
+    }
+
+    .demo-overlay__step.active {
+      background: var(--color-green);
+    }
+
+    .demo-overlay__step.done {
+      background: var(--color-green);
+      opacity: 0.5;
+    }
+
+    .demo-overlay__level-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-left: 12px;
+    }
+
+    .demo-overlay__close {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--surface-border);
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .demo-overlay__close:hover {
+      background: var(--surface);
+      color: var(--text-primary);
+      border-color: var(--text-muted);
+    }
+
+    .demo-overlay__close svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Overlay body — level container */
+    .demo-overlay__body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-xl);
+      overflow: hidden;
+    }
+
+    .demo-overlay__level {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 640px;
+      text-align: center;
+      animation: levelFadeIn 0.5s ease both;
+    }
+
+    .demo-overlay__level.active {
+      display: flex;
+    }
+
+    @keyframes levelFadeIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .demo-overlay__level-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-green);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: var(--space-sm);
+    }
+
+    .demo-overlay__level-desc {
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-xl);
+      line-height: 1.3;
+    }
+
+    /* Shared demo stage (inside overlay levels) */
+    .demo-stage {
+      position: relative;
+      width: 100%;
+      border-radius: var(--radius-2xl);
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      padding: var(--space-2xl);
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Hotkey indicator (visual UI element) */
+    .demo-hotkey-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: var(--space-lg);
+      padding: 10px 22px;
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      box-shadow: 0 3px 0 var(--surface-border);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.15s ease, border-color 0.2s ease;
+    }
+
+    .demo-hotkey-indicator.visible:hover {
+      border-color: var(--color-green);
+      box-shadow: 0 3px 0 var(--surface-border), 0 0 16px rgba(47, 174, 122, 0.2);
+    }
+
+    /* Demo overlay comet canvas */
+    .demo-overlay__comet {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .demo-hotkey-indicator.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .demo-hotkey-indicator.pressed {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--surface-border);
+      border-color: var(--color-green);
+      color: var(--color-green);
+    }
+
+    .demo-hotkey-indicator kbd {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--bg-primary);
+      border-radius: 4px;
+      font-family: var(--font-family);
+      font-size: 12px;
+      border: 1px solid var(--surface-border);
+    }
+
+    /* Auto-play caption */
+    .demo-auto-caption {
+      margin-top: var(--space-md);
+      font-size: 14px;
+      color: var(--text-tertiary);
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .demo-auto-caption.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Level transition overlay */
+    .demo-overlay__transition {
+      position: absolute;
+      inset: 0;
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: var(--space-md);
+      opacity: 0;
+      visibility: hidden;
+      z-index: 5;
+      transition: opacity 0.4s ease, visibility 0s 0.4s;
+    }
+
+    .demo-overlay__transition.active {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.4s ease, visibility 0s 0s;
+    }
+
+    .demo-overlay__transition-text {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .demo-overlay__transition-sub {
+      font-size: 14px;
+      color: var(--text-tertiary);
+    }
+
+    /* Selection success animation (localized confetti burst) */
+    .selection-success {
+      position: absolute;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .selection-success__particle {
+      position: absolute;
+      border-radius: 50%;
+      animation: particleBurst 0.7s ease-out forwards;
+    }
+
+    @keyframes particleBurst {
+      0% { opacity: 1; transform: translate(0, 0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+    }
+
+    .magic-ripple {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      margin-top: -150px;
+      margin-left: -150px;
+      background: radial-gradient(circle, rgba(160, 130, 255, 0.4) 0%, rgba(160, 130, 255, 0) 70%);
+      border-radius: 50%;
+      transform: scale(0);
+      opacity: 1;
+      pointer-events: none;
+      z-index: 10;
+      animation: rippleExpand 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    @keyframes rippleExpand {
+      0% { transform: scale(0); opacity: 1; }
+      100% { transform: scale(4); opacity: 0; }
+    }
+
+    /* Finish screen */
+    .demo-finish {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      max-width: 640px;
+      padding: 40px;
+      text-align: center;
+      gap: var(--space-lg);
+      animation: levelFadeIn 0.5s ease both;
+    }
+
+    .demo-finish.active {
+      display: flex;
+    }
+
+    .demo-finish__icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(47, 174, 122, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-green);
+    }
+
+    .demo-finish__icon svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .demo-finish__title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .demo-finish__desc {
+      font-size: 16px;
+      color: var(--text-tertiary);
+      max-width: 400px;
+    }
+
+    .demo-finish__btn {
+      padding: 14px 36px;
+      border-radius: var(--radius-md);
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
+      font-size: 16px;
+      font-weight: 600;
+      font-family: var(--font-family);
+      border: none;
+      cursor: pointer;
+      transition: filter var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .demo-finish__btn:hover {
+      filter: brightness(0.92);
+      transform: translateY(-1px);
+    }
+
+    /* Overlay mobile adjustments */
+    @media (max-width: 768px) {
+      .demo-overlay__bar {
+        padding: 12px 16px;
+      }
+
+      .demo-overlay__body {
+        padding: var(--space-md);
+      }
+
+      .demo-overlay__level-desc {
+        font-size: 20px;
+      }
+
+      .demo-stage {
+        padding: var(--space-lg);
+        min-height: 220px;
+      }
+    }
+
+    /* =============================================
+       HOW IT WORKS
+       ============================================= */
+
+    #how-it-works {
+      padding: var(--space-4xl) 0;
+    }
+
+    .hiw__header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .hiw__title {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .hiw__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .hiw__step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .hiw__icon {
+      width: 48px;
+      height: 48px;
+      color: var(--color-green);
+      opacity: 0.8;
+      margin-bottom: var(--space-md);
+    }
+
+    .hiw__label {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* =============================================
+       PRIVACY / TRUST
+       ============================================= */
+
+    #privacy-trust {
+      padding: var(--space-3xl) 0;
+    }
+
+    .trust__header {
+      text-align: center;
+      margin-bottom: var(--space-xl);
+    }
+
+    .trust__title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .trust__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-xl);
+    }
+
+    .trust__item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+    }
+
+    .trust__icon {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      color: var(--color-green);
+      opacity: 0.75;
+      margin-top: 2px;
+    }
+
+    .trust__text {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* =============================================
+       PRICING
+       ============================================= */
+
+    #pricing {
+      padding: var(--space-4xl) 0;
+    }
+
+    .pricing__header {
+      text-align: center;
+      margin-bottom: var(--space-xl);
+    }
+
+    .pricing__title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .pricing__subtitle {
+      font-size: 16px;
+      color: var(--text-tertiary);
+      margin-top: var(--space-sm);
+    }
+
+    .pricing__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    /* Individual pricing card */
+    .pricing-card {
+      padding: var(--space-xl);
+      border-radius: var(--radius-2xl);
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      transition: background var(--transition-base), border-color var(--transition-base);
+      position: relative;
+    }
+
+    /* Highlighted Tier 2 */
+    .pricing-card--popular {
+      transform: scale(1.05);
+      border-color: var(--color-green);
+      box-shadow: 0 0 40px rgba(47, 174, 122, 0.08);
+      z-index: 1;
+    }
+
+    .pricing-card__badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      background: var(--color-green);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .pricing-card__name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .pricing-card__price-row {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-sm);
+      margin-top: 12px;
+    }
+
+    .pricing-card__price {
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+      transition: opacity 0.2s ease;
+    }
+
+    .pricing-card__price-label {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* AI Credits toggle (Tier 3) */
+    .pricing-card__toggle-wrap {
+      margin-top: 12px;
+      margin-bottom: 8px;
+    }
+
+    .credits-toggle {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: var(--radius-full);
+      background: var(--bg-primary);
+      border: 1px solid var(--surface-border);
+      gap: 2px;
+    }
+
+    .credits-toggle__opt {
+      padding: 7px 14px;
+      border: none;
+      border-radius: var(--radius-full);
+      background: transparent;
+      font-family: var(--font-family);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .credits-toggle__opt:hover {
+      color: var(--text-primary);
+    }
+
+    .credits-toggle__opt.active {
+      background: var(--color-green);
+      color: #fff;
+    }
+
+    /* Feature list */
+    .pricing-card__features {
+      list-style: none;
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .pricing-card__feature {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .pricing-card__check {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: var(--color-green);
+      margin-top: 2px;
+    }
+
+    /* Pricing buttons */
+    .pricing-card__btn {
+      display: block;
+      width: 100%;
+      margin-top: 24px;
+      padding: 12px 0;
+      border-radius: var(--radius-md);
+      font-family: var(--font-family);
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .pricing-card__btn--primary {
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
+      border: none;
+    }
+
+    .pricing-card__btn--primary:hover {
+      filter: brightness(0.92);
+    }
+
+    .pricing-card__btn--secondary {
+      background: transparent;
+      color: var(--btn-secondary-text);
+      border: 1px solid var(--btn-secondary-border);
+    }
+
+    .pricing-card__btn--secondary:hover {
+      border-color: var(--color-green);
+      color: var(--color-green);
+    }
+
+    /* Pricing footer text */
+    .pricing__footer {
+      text-align: center;
+      margin-top: var(--space-xl);
+    }
+
+    .pricing__upgrade {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .pricing__upgrade a {
+      color: var(--color-green);
+      text-decoration: none;
+    }
+
+    .pricing__upgrade a:hover {
+      text-decoration: underline;
+    }
+
+    .pricing__disclaimer {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      max-width: 480px;
+      margin: var(--space-md) auto 0;
+      line-height: 1.6;
+    }
+
+    /* =============================================
+       FINAL CTA
+       ============================================= */
+
+    #final-cta {
+      padding: var(--space-5xl) 0;
+    }
+
+    .cta__title {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .cta__primary {
+      display: block;
+      margin: var(--space-xl) auto 0;
+      padding: 16px 32px;
+      font-size: 18px;
+      font-weight: 600;
+      font-family: var(--font-family);
+      color: var(--btn-primary-text);
+      background: var(--btn-primary-bg);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: filter var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .cta__primary:hover {
+      filter: brightness(0.92);
+      transform: translateY(-1px);
+    }
+
+    /* "or" divider */
+    .cta__divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin: 20px 0;
+    }
+
+    .cta__divider::before,
+    .cta__divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--surface-border);
+    }
+
+    .cta__divider span {
+      font-size: 14px;
+      color: var(--text-faint);
+    }
+
+    /* Email form */
+    .cta__email-form {
+      display: flex;
+      gap: var(--space-sm);
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .cta__email-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--btn-secondary-border);
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      font-size: 15px;
+      outline: none;
+      transition: border-color var(--transition-fast);
+    }
+
+    .cta__email-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .cta__email-input:focus {
+      border-color: var(--color-green);
+    }
+
+    .cta__email-btn {
+      padding: 12px 20px;
+      border: 1px solid var(--btn-secondary-border);
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--btn-secondary-text);
+      font-family: var(--font-family);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--transition-fast);
+    }
+
+    .cta__email-btn:hover {
+      border-color: var(--color-green);
+      color: var(--color-green);
+    }
+
+    .cta__email-hint {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+
+    /* Inline confirmation replaces form */
+    .cta__email-success {
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-secondary);
+      padding: 12px 0;
+    }
+
+    .cta__preorder-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-faint);
+      max-width: 400px;
+      margin: var(--space-xl) auto 0;
+      line-height: 1.6;
+    }
+
+    /* =============================================
+       FOOTER
+       ============================================= */
+
+    .footer {
+      padding: var(--space-2xl) 0;
+      border-top: 1px solid var(--footer-border);
+      transition: border-color var(--transition-base);
+    }
+
+    .footer__inner {
+      max-width: var(--content-max-width);
+      margin: 0 auto;
+      padding: 0 var(--space-xl);
+    }
+
+    .footer__brand {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      opacity: 0.9;
+    }
+
+    .footer__links {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-lg);
+      margin-top: var(--space-md);
+      font-size: 14px;
+    }
+
+    .footer__copy {
+      color: var(--text-tertiary);
+    }
+
+    .footer__link {
+      color: var(--text-tertiary);
+      text-decoration: none;
+      transition: opacity var(--transition-fast);
+    }
+
+    .footer__link:hover {
+      opacity: 1;
+      color: var(--text-primary);
+    }
+
+    /* Follow button + popup */
+    .footer__follow-wrap {
+      position: relative;
+    }
+
+    .footer__follow-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      font-family: var(--font-family);
+      font-size: 14px;
+      cursor: pointer;
+      padding: 0;
+      transition: color var(--transition-fast);
+    }
+
+    .footer__follow-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .footer__follow-btn svg {
+      width: 12px;
+      height: 12px;
+      transition: transform var(--transition-fast);
+    }
+
+    .footer__follow-btn.open svg {
+      transform: rotate(180deg);
+    }
+
+    .footer__popup {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 180px;
+      padding: var(--space-sm);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(4px);
+      transition: opacity var(--transition-fast), transform var(--transition-fast);
+      z-index: 100;
+    }
+
+    .footer__popup.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .footer__popup-link {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      transition: background var(--transition-fast);
+    }
+
+    .footer__popup-link:hover {
+      background: var(--toggle-hover);
+    }
+
+    .footer__popup-link svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    /* =============================================
+       RESPONSIVE
+       ============================================= */
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 0 var(--space-md);
+      }
+
+      .container {
+        padding: 0 var(--space-md);
+      }
+
+      #hero {
+        min-height: 100vh;
+      }
+
+      .hero__title {
+        font-size: 40px;
+      }
+
+      .hero__subtitle {
+        font-size: 17px;
+      }
+
+      .header__cta {
+        padding: 8px 16px;
+        font-size: 13px;
+      }
+
+      /* Hero shapes replaced by planet system */
+
+      /* Pain */
+      .pain__grid {
+        grid-template-columns: 1fr;
+      }
+
+      /* Demo */
+      .demo__scene-wrap {
+        padding: var(--space-lg);
+        min-height: 320px;
+      }
+
+      .demo__tab {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+
+      .translate__text-line {
+        font-size: 18px;
+      }
+
+      .demo__hotkey {
+        border-radius: var(--radius-full);
+        padding: 14px 32px;
+        box-shadow: none;
+        background: var(--color-green);
+        color: #fff;
+        border-color: transparent;
+      }
+
+      .demo__hotkey:hover {
+        box-shadow: none;
+        border-color: transparent;
+      }
+
+      .demo__hotkey:active {
+        transform: scale(0.97);
+        box-shadow: none;
+      }
+
+      .demo__hotkey .mobile-label { display: inline; }
+      .demo__hotkey .desktop-label { display: none; }
+
+      .demo__drag-hint .mobile-label { display: inline; }
+      .demo__drag-hint .desktop-label { display: none; }
+
+      .assist__blocks {
+        max-width: 280px;
+      }
+
+      /* How it works */
+      .hiw__grid {
+        grid-template-columns: 1fr;
+        max-width: 320px;
+        gap: var(--space-xl);
+      }
+
+      /* Trust */
+      .trust__grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+
+      /* Pricing */
+      .pricing__grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      .pricing-card--popular {
+        transform: none;
+      }
+
+      .credits-toggle__opt {
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      /* Final CTA */
+      .cta__title {
+        font-size: 28px;
+      }
+
+      .cta__primary {
+        font-size: 16px;
+        padding: 14px 28px;
+      }
+
+      .cta__email-form {
+        flex-direction: column;
+      }
+
+      /* Footer */
+      .footer__links {
+        gap: var(--space-md);
+      }
+
+      .footer__popup {
+        left: auto;
+        right: 0;
+        transform: translateY(4px);
+      }
+
+      .footer__popup.open {
+        transform: translateY(0);
+      }
+    }
+    /* =============================================
+       GLOBAL MICRO-INTERACTIONS
+       Smooth transitions on all clickable/interactive elements
+       ============================================= */
+
+    a, button, input, select, textarea {
+      transition-property: color, background-color, border-color, opacity, box-shadow, transform, filter;
+      transition-duration: 200ms;
+      transition-timing-function: ease;
+    }
+
+    /* Ensure specific component transitions override gracefully */
+    a:active, button:active {
+      transition-duration: 80ms;
+    }
+
+    /* =============================================
+       STARRY BACKGROUND
+       ============================================= */
+    .stars-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* =============================================
+       3D DRUM PLANET CAROUSEL
+       ============================================= */
+    .hero__planets-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      aspect-ratio: 1.8;
+      margin: var(--space-md) auto var(--space-sm);
+      z-index: 1;
+    }
+
+    .hero__planets-canvas {
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .hero__planets-canvas:active {
+      cursor: grabbing;
+    }
+
+    .planet-tooltip {
+      position: fixed;
+      padding: 8px 18px;
+      border-radius: var(--radius-md);
+      background: rgba(12, 12, 20, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--font-family);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 180ms ease, transform 180ms ease;
+      z-index: 10000;
+      white-space: nowrap;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      transform: translateY(4px);
+    }
+
+    .planet-tooltip.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    [data-theme="light"] .planet-tooltip {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      color: var(--text-primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* =============================================
+       COMET (SCROLL ANIMATION)
+       ============================================= */
+    .comet-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Z-index depth layering — comet hides behind content-heavy sections */
+    #pain, #demo, #pricing {
+      position: relative;
+      z-index: 10;
+      background: var(--bg-primary);
+    }
+
+    #how-it-works, #privacy-trust {
+      position: relative;
+      z-index: 10;
+      background: var(--bg-primary);
+    }
+
+    .footer {
+      position: relative;
+      z-index: 10;
+      background: var(--bg-primary);
+    }
+
+    #final-cta {
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    /* =============================================
+       RESPONSIVE — PLANET CAROUSEL
+       ============================================= */
+    @media (max-width: 768px) {
+      .hero__planets-wrap {
+        max-width: 440px;
+        margin: var(--space-sm) auto 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero__planets-wrap {
+        max-width: 340px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ========== HEADER ========== -->
+  <header class="header" id="header">
+    <a href="./index.html" class="header__logo">
+      <span class="header__logo-icon-wrap">
+        <img src="logo.png" alt="Vexora V logo" class="header__logo-icon">
+      </span>
+      <span class="header__logo-text">Vexora</span>
+    </a>
+    <div class="header__right">
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <!-- Sun icon (shown in light theme) -->
+        <svg class="theme-toggle__sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon (shown in dark theme) -->
+        <svg class="theme-toggle__moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <!-- CTA — anchors to demo section -->
+      <a href="#demo" class="header__cta" id="header-demo-btn">See It In Action</a>
+      <!-- Preorder CTA in header links to pricing -->
+      <!-- Note: main preorder CTA is in hero section -->
+    </div>
+  </header>
+
+  <!-- ========== SECTION 1: HERO ========== -->
+  <section class="section" id="hero">
+    <canvas class="stars-canvas" id="hero-stars"></canvas>
+
+    <div class="hero__content" style="padding: 0 var(--space-xl);">
+      <h1 class="hero__title">Your Translation. Your Game. One&nbsp;Hotkey.</h1>
+      <p class="hero__subtitle">Live translation appears right over your screen. No downloads. No tab-switching. No waiting on a fan patch that's never coming.</p>
+    </div>
+
+    <div class="hero__planets-wrap" id="planets-wrap">
+      <canvas class="hero__planets-canvas" id="planets-canvas"></canvas>
+    </div>
+
+    <div class="hero__content" style="padding: 0 var(--space-xl);">
+      <div class="hero__cta-group">
+        <button class="hero__cta hero__cta--secondary" id="hero-demo-btn">See Demo</button>
+        <a href="#pricing" class="hero__cta">Preorder</a>
+      </div>
+      <p class="hero__micro">Windows, Mac &amp; Linux · Setup takes under a minute</p>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 2: PAIN ========== -->
+  <section class="section" id="pain">
+    <div class="container">
+      <div class="pain__grid">
+
+        <!-- Card 1 -->
+        <div class="pain-card">
+          <svg class="pain-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <h3 class="pain-card__title">Fan translations that never ship</h3>
+          <p class="pain-card__text">Some games wait years for an unofficial translation. Some never get one at all.</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="pain-card">
+          <svg class="pain-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+            <line x1="15" y1="8" x2="9" y2="12"/>
+            <line x1="9" y1="8" x2="15" y2="12"/>
+          </svg>
+          <h3 class="pain-card__title">Screenshot, tab-switch, repeat</h3>
+          <p class="pain-card__text">Every workaround breaks your flow — alt-tab, upload, wait, come back to find you missed the scene.</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="pain-card">
+          <svg class="pain-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="4" width="16" height="16" rx="2"/>
+            <rect x="9" y="9" width="6" height="6"/>
+            <line x1="9" y1="1" x2="9" y2="4"/>
+            <line x1="15" y1="1" x2="15" y2="4"/>
+            <line x1="9" y1="20" x2="9" y2="23"/>
+            <line x1="15" y1="20" x2="15" y2="23"/>
+            <line x1="20" y1="9" x2="23" y2="9"/>
+            <line x1="20" y1="14" x2="23" y2="14"/>
+            <line x1="1" y1="9" x2="4" y2="9"/>
+            <line x1="1" y1="14" x2="4" y2="14"/>
+          </svg>
+          <h3 class="pain-card__title">Heavy tools that slow you down</h3>
+          <p class="pain-card__text">Most translators eat your CPU and your framerate. Yours shouldn't.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 3: INTERACTIVE DEMO ========== -->
+  <section class="section" id="demo">
+    <div class="container" style="text-align: center;">
+      <h2 class="demo__title">See it in action</h2>
+      <p style="font-size: 17px; color: var(--text-tertiary); margin-top: var(--space-sm); margin-bottom: var(--space-xl); max-width: 480px; margin-left: auto; margin-right: auto;">Three interactive levels. Try translation, text extraction, and AI assist — right here.</p>
+      <button class="hero__cta" id="try-product-btn" style="font-size: 17px; padding: 16px 40px;">
+        ▶︎ Try Product
+      </button>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 4: HOW IT WORKS ========== -->
+  <section class="section" id="how-it-works">
+    <div class="container">
+      <div class="hiw__header">
+        <h2 class="hiw__title">Three steps. Zero friction.</h2>
+      </div>
+      <div class="hiw__grid">
+        <!-- Step 1 -->
+        <div class="hiw__step">
+          <svg class="hiw__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <line x1="6" y1="8" x2="6" y2="8.01"/>
+            <line x1="10" y1="8" x2="10" y2="8.01"/>
+            <line x1="14" y1="8" x2="14" y2="8.01"/>
+            <line x1="18" y1="8" x2="18" y2="8.01"/>
+            <line x1="4" y1="12" x2="20" y2="12"/>
+            <line x1="6" y1="16" x2="18" y2="16"/>
+          </svg>
+          <span class="hiw__label">Hotkey</span>
+        </div>
+        <!-- Step 2 -->
+        <div class="hiw__step">
+          <svg class="hiw__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          <span class="hiw__label">Instant action</span>
+        </div>
+        <!-- Step 3 -->
+        <div class="hiw__step">
+          <svg class="hiw__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="6" y1="11" x2="10" y2="11"/>
+            <line x1="8" y1="9" x2="8" y2="13"/>
+            <line x1="15" y1="12" x2="15.01" y2="12"/>
+            <line x1="18" y1="10" x2="18.01" y2="10"/>
+            <rect x="2" y="6" width="20" height="12" rx="4"/>
+          </svg>
+          <span class="hiw__label">Keep playing</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 5: PRIVACY / TRUST ========== -->
+  <section class="section" id="privacy-trust">
+    <div class="container container--narrow">
+      <div class="trust__header">
+        <h2 class="trust__title">Built to stay out of your way</h2>
+      </div>
+      <div class="trust__grid">
+        <!-- Item 1 -->
+        <div class="trust__item">
+          <svg class="trust__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="4" width="16" height="16" rx="2"/>
+            <rect x="9" y="9" width="6" height="6"/>
+            <line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/>
+            <line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/>
+            <line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/>
+            <line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>
+          </svg>
+          <span class="trust__text">Runs locally by default</span>
+        </div>
+        <!-- Item 2 -->
+        <div class="trust__item">
+          <svg class="trust__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
+            <line x1="16" y1="8" x2="2" y2="22"/>
+            <line x1="17.5" y1="15" x2="9" y2="15"/>
+          </svg>
+          <span class="trust__text">Lightweight — won't touch your framerate</span>
+        </div>
+        <!-- Item 3 -->
+        <div class="trust__item">
+          <svg class="trust__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <rect x="10" y="10" width="4" height="5" rx="1"/>
+            <circle cx="12" cy="8" r="1.5"/>
+          </svg>
+          <span class="trust__text">Nothing leaves your device unless you say so</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 6: PRICING ========== -->
+  <section class="section" id="pricing">
+    <div class="container">
+
+      <div class="pricing__header">
+        <h2 class="pricing__title">One-time payment. Pick what you need.</h2>
+        <p class="pricing__subtitle">No subscriptions. Pay once, own it forever.</p>
+      </div>
+
+      <div class="pricing__grid">
+
+        <!-- TIER 1 -->
+        <div class="pricing-card">
+          <h3 class="pricing-card__name">Translate</h3>
+          <div class="pricing-card__price-row">
+            <span class="pricing-card__price">$10</span>
+            <span class="pricing-card__price-label">one-time</span>
+          </div>
+          <ul class="pricing-card__features">
+            <li class="pricing-card__feature">
+              <svg class="pricing-card__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Live translation overlay
+            </li>
+            <li class="pricing-card__feature">
+              <svg class="pricing-card__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Unlimited translations — no monthly cap
+            </li>
+            <li class="pricing-card__feature">
+              <svg class="pricing-card__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Runs OCR locally on your device
+            </li>
+          </ul>
+          <a href="#pending-checkout" class="pricing-card__btn pricing-card__btn--secondary" id="btn-tier1">Get Translate</a>
+        </div>
+
+        <!-- TIER 2 (highlighted) -->
+        <div class="pricing-card pricing-card--popular">
+          <span class="pricing-card__badge">Most Popular</span>
+          <h3 class="pricing-card__name">Translate + Extract</h3>
+          <div class="pricing-card__price-row">
+            <span class="pricing-card__price">$15</span>
+            <span class="pricing-card__price-label">one-time</span>
+          </div>
+          <ul class="pricing-card__features">
+            <li class="pricing-card__feature">
+              <svg class="pricing-card__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Everything in Translate
+            </li>
+            <li class="pricing-card__feature">
+              <svg class="pricing-card__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Text extractor — copy anything on screen
+            </li>
+            <li class="pricing-card__feature">
+              <svg class="pricing-card__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Unlimited translations and extracts
+            </li>
+            <li class="pricing-card__feature">
+              <svg class="pricing-card__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Runs entirely on-device, nothing uploaded
+            </li>
+          </ul>
+          <a href="#pending-checkout" class="pricing-card__btn pricing-card__btn--primary" id="btn-tier2">Get Translate + Extract</a>
+        </div>
+
+        <!-- TIER 3 (with AI Credits toggle) -->
+        <div class="pricing-card">
+          <h3 class="pricing-card__name">Everything</h3>
+          <div class="pricing-card__price-row">
+            <span class="pricing-card__price" id="tier3-price">$30</span>
+            <span class="pricing-card__price-label">one-time</span>
+          </div>
+
+          <!-- AI Credits toggle -->
+          <div class="pricing-card__toggle-wrap">
+            <div class="credits-toggle" id="credits-toggle">
+              <button class="credits-toggle__opt active" data-credits="1m">1M AI Credits — included</button>
+              <button class="credits-toggle__opt" data-credits="5m">5M AI Credits — +$20</button>
+            </div>
+          </div>
+
+          <ul class="pricing-card__features">
+            <li class="pricing-card__feature">
+              <svg class="pricing-card__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Everything in Translate + Extract
+            </li>
+            <li class="pricing-card__feature">
+              <svg class="pricing-card__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              AI Assist — fix errors, explain code, answer anything on screen
+            </li>
+            <li class="pricing-card__feature">
+              <svg class="pricing-card__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Unlimited translate &amp; extract, always
+            </li>
+            <li class="pricing-card__feature">
+              <svg class="pricing-card__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Running low on AI Credits? Plug in your own API key anytime in settings — free, unlimited
+            </li>
+          </ul>
+          <a href="#pending-checkout" class="pricing-card__btn pricing-card__btn--secondary" id="btn-tier3">Get Everything</a>
+        </div>
+
+      </div>
+
+      <!-- Upgrade + disclaimer -->
+      <div class="pricing__footer">
+        <p class="pricing__upgrade">Already own a lower tier? <a href="mailto:noxielabs@gmail.com">Upgrade and pay only the difference →</a></p>
+        <p class="pricing__disclaimer">This is a pre-order. Vexora is in active development — you're securing founding pricing now, with expected delivery in 12 to 24 weeks. Full refund anytime before launch, no questions asked.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== SECTION 7: FINAL CTA ========== -->
+  <section class="section" id="final-cta">
+    <canvas class="stars-canvas" id="cta-stars"></canvas>
+    <div class="container container--cta" style="position: relative; z-index: 2;">
+      <h2 class="cta__title">Ready to stop guessing what they're saying?</h2>
+
+      <a href="#pending-checkout" class="cta__primary" id="cta-primary-btn">Get Started — $15</a>
+
+      <div class="cta__divider"><span>or</span></div>
+
+      <!-- Email form (inline confirmation, no redirect) -->
+      <div id="email-form-wrap">
+        <form class="cta__email-form" id="email-form" novalidate>
+          <input class="cta__email-input" type="email" name="email" placeholder="you@email.com" required autocomplete="email">
+          <button class="cta__email-btn" type="submit">Notify me</button>
+        </form>
+        <p class="cta__email-hint">Not ready to commit? We'll email you when it's live.</p>
+      </div>
+
+      <p class="cta__preorder-note">Pre-order — Vexora is still in development. Full refund anytime before launch.</p>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer" id="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">Vexora</div>
+      <div class="footer__links">
+        <span class="footer__copy">Vexora © 2026</span>
+        <a href="./privacy.html" class="footer__link">Privacy</a>
+        <a href="./terms.html" class="footer__link">Terms</a>
+        <a href="https://tally.so/r/rjQXMv" class="footer__link" id="footer-feedback" target="_blank" rel="noopener">Got feedback?</a>
+
+        <!-- Follow popup -->
+        <div class="footer__follow-wrap">
+          <button class="footer__follow-btn" id="follow-btn">
+            Follow
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="footer__popup" id="follow-popup">
+            <!-- Twitter/X -->
+            <a href="https://x.com/noxielabs" class="footer__popup-link" id="social-twitter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.054 10.054 0 01-3.127 1.195 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+              Twitter (X)
+            </a>
+            <!-- Telegram -->
+            <a href="https://t.me/noxielabs" class="footer__popup-link" id="social-telegram" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              Telegram
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== FULL-SCREEN DEMO OVERLAY ========== -->
+  <div class="demo-overlay" id="demo-overlay">
+    <div class="demo-overlay__bar">
+      <div class="demo-overlay__progress">
+        <div class="demo-overlay__step" id="step-1"></div>
+        <div class="demo-overlay__step" id="step-2"></div>
+        <div class="demo-overlay__step" id="step-3"></div>
+        <span class="demo-overlay__level-label" id="level-label">Level 1 / 3</span>
+      </div>
+      <button class="demo-overlay__close" id="overlay-close" aria-label="Close demo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <canvas class="demo-overlay__comet" id="demo-comet-canvas"></canvas>
+
+    <div class="demo-overlay__body">
+      <!-- Level transition screen -->
+      <div class="demo-overlay__transition" id="level-transition">
+        <div class="demo-overlay__transition-text" id="transition-text">Level Complete!</div>
+        <div class="demo-overlay__transition-sub" id="transition-sub">Moving to next level...</div>
+      </div>
+
+      <!-- LEVEL 1: Translate (user-triggered) -->
+      <div class="demo-overlay__level" id="overlay-level-1">
+        <div class="demo-overlay__level-title">Level 1 — Translate</div>
+        <p class="demo-overlay__level-desc">Press the hotkey to translate</p>
+
+        <div class="demo-stage">
+          <div class="translate__speaker">
+            <div class="translate__avatar"></div>
+            <span class="translate__speaker-name">NPC</span>
+          </div>
+          <div class="translate__text-line" id="ol-translate-text"></div>
+        </div>
+
+        <div class="demo-hotkey-indicator" id="ol-hotkey-indicator">
+          <kbd>Hotkey</kbd> <span style="margin-left: 4px;">Translate</span>
+        </div>
+        <p class="demo-auto-caption" id="ol-translate-caption">That's it. No alt-tab, no dictionary, no guessing.</p>
+      </div>
+
+      <!-- LEVEL 2: Extract (user selects) -->
+      <div class="demo-overlay__level" id="overlay-level-2">
+        <div class="demo-overlay__level-title">Level 2 — Extract</div>
+        <p class="demo-overlay__level-desc">Drag to select the text block</p>
+
+        <div class="demo-stage" id="ol-extract-stage">
+          <div class="demo__geo-frame demo__geo-frame--draggable" id="ol-extract-frame" style="max-width: 100%;">
+            <div class="extract__lines" id="ol-extract-lines">
+              <div class="extract__line"></div>
+              <div class="extract__line"></div>
+              <div class="extract__line"></div>
+              <div class="extract__line"></div>
+              <div class="extract__line"></div>
+              <div class="extract__line"></div>
+              <div class="extract__selection" id="ol-extract-selection"></div>
+            </div>
+            <div class="demo__toast" id="ol-extract-toast">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Copied to clipboard
+            </div>
+            <div class="demo__select-rect" id="ol-extract-select-rect"></div>
+          </div>
+        </div>
+        <p class="demo-auto-caption" id="ol-extract-caption">Grab any text on screen. Paste it wherever you need it.</p>
+      </div>
+
+      <!-- LEVEL 3: Assist (user selects) -->
+      <div class="demo-overlay__level" id="overlay-level-3">
+        <div class="demo-overlay__level-title">Level 3 — Assist</div>
+        <p class="demo-overlay__level-desc">Select the broken blocks to fix them</p>
+
+        <div class="demo-stage" id="ol-assist-stage">
+          <div class="demo__geo-frame demo__geo-frame--draggable" id="ol-assist-frame" style="max-width: 100%;">
+            <div class="assist__blocks" id="ol-assist-blocks">
+              <div class="assist__block glitched"></div>
+              <div class="assist__block glitched"></div>
+              <div class="assist__block glitched"></div>
+              <div class="assist__block glitched"></div>
+              <div class="assist__block glitched"></div>
+              <div class="assist__block glitched"></div>
+            </div>
+            <p class="assist__result" id="ol-assist-result">Fixed. Here's what went wrong: mismatched bracket on line 12.</p>
+            <div class="demo__select-rect" id="ol-assist-select-rect"></div>
+          </div>
+        </div>
+        <p class="demo-auto-caption" id="ol-assist-caption">From broken terminal output to a clear answer — instantly.</p>
+      </div>
+
+      <!-- FINISH screen -->
+      <div class="demo-finish" id="overlay-finish">
+        <div class="demo-finish__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="demo-finish__title">Demo Complete</div>
+        <p class="demo-finish__desc">You've seen Translate, Extract, and Assist in action. Ready to get started?</p>
+        <button class="demo-finish__btn" id="overlay-finish-btn">Finish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comet overlay canvas -->
+  <canvas class="comet-canvas" id="comet-canvas"></canvas>
+
+  <!-- Planet tooltip -->
+  <div class="planet-tooltip" id="planet-tooltip"></div>
+
+  <script>
+    /* =============================================
+       CONFIG — named constants for connectors
+       (design-brief.md §10, mvp-toolbox.md)
+       ============================================= */
+    const CONFIG = {
+      // Lemon Squeezy Checkout Links (Leave empty until you pass verification)
+      LEMONSQUEEZY_CHECKOUT_URL_TIER1: "", 
+      LEMONSQUEEZY_CHECKOUT_URL_TIER2: "",
+      LEMONSQUEEZY_CHECKOUT_URL_TIER3_BASE: "",
+      LEMONSQUEEZY_CHECKOUT_URL_TIER3_PLUS: "",
+      
+      // Loops.so Form Endpoint (Paste your Loops endpoint URL here)
+      EMAIL_FORM_ENDPOINT: "https://app.loops.so/api/newsletter-form/cmslrspyg0m100j4dcmnsko24",
+      
+      // External Links (Replace these with your actual URLs)
+      FEEDBACK_FORM_URL: "https://tally.so/r/rjQXMv", // Example Tally link
+      TWITTER_URL: "https://x.com/noxielabs",
+      TELEGRAM_URL: "https://t.me/noxielabs",
+    };
+
+    /* =============================================
+       THEME TOGGLE
+       ============================================= */
+    const html = document.documentElement;
+    const toggle = document.getElementById('theme-toggle');
+
+    // Restore saved theme or default to dark
+    const savedTheme = localStorage.getItem('vexora-theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+
+    toggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('vexora-theme', next);
+    });
+
+    /* =============================================
+       HEADER SCROLL STATE
+       ============================================= */
+    const header = document.getElementById('header');
+
+    const onScroll = () => {
+      if (window.scrollY > 10) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // init
+
+    /* =============================================
+       HERO PARALLAX — mouse-driven bg shift
+       (design-brief §1: "легкий parallax при русі
+        миші, зсув 5-10px")
+       ============================================= */
+    const heroBg = document.getElementById('hero-bg');
+    const heroSection = document.getElementById('hero');
+
+    if (heroBg && heroSection) {
+      let rafId = null;
+
+      heroSection.addEventListener('mousemove', (e) => {
+        if (rafId) return; // throttle to one rAF
+        rafId = requestAnimationFrame(() => {
+          const rect = heroSection.getBoundingClientRect();
+          // Normalise cursor position to -1…+1 from center
+          const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+          const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+          // Shift up to ±10px
+          const dx = nx * 10;
+          const dy = ny * 10;
+          heroBg.style.transform = `translate(${dx}px, ${dy}px)`;
+          rafId = null;
+        });
+      });
+
+      heroSection.addEventListener('mouseleave', () => {
+        heroBg.style.transition = 'transform 0.6s ease';
+        heroBg.style.transform = 'translate(0, 0)';
+        setTimeout(() => { heroBg.style.transition = ''; }, 600);
+      });
+    }
+
+    /* =============================================
+       GAMIFIED DEMO — Full-screen overlay with levels
+       ============================================= */
+
+    const GLYPHS = 'ΨΞΩΣΔΘΛΦαβγδεζηθλμξπρσφψωᚠᚢᚦᚨᚱᚲᛃᛇᛈᛉᛊᛏᛒᛗᛚᛞ';
+    const TRANSLATED = 'Wait — I understand this now.';
+    function randomGlyph() { return GLYPHS[Math.floor(Math.random() * GLYPHS.length)]; }
+    function buildGlyphString(t) { return t.split('').map(c => c === ' ' ? ' ' : randomGlyph()).join(''); }
+
+    // --- Overlay state machine ---
+    const overlay = document.getElementById('demo-overlay');
+    const overlayBody = overlay.querySelector('.demo-overlay__body');
+    const levelLabel = document.getElementById('level-label');
+    const steps = [document.getElementById('step-1'), document.getElementById('step-2'), document.getElementById('step-3')];
+    const levels = [document.getElementById('overlay-level-1'), document.getElementById('overlay-level-2'), document.getElementById('overlay-level-3')];
+    const finishScreen = document.getElementById('overlay-finish');
+    const transitionEl = document.getElementById('level-transition');
+    const transitionText = document.getElementById('transition-text');
+    const transitionSub = document.getElementById('transition-sub');
+    let currentLevel = 0;
+    let translateLoopTimer = null;
+    let overlayOpen = false;
+
+    function openOverlay() {
+      overlayOpen = true;
+      document.body.style.overflow = 'hidden';
+      overlay.classList.add('open');
+      startLevel(1);
+    }
+
+    function closeOverlay() {
+      overlayOpen = false;
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+      stopTranslateLoop();
+      stopDemoComet();
+      // Scroll back to the Try Product button
+      setTimeout(() => {
+        const btn = document.getElementById('try-product-btn');
+        if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 500);
+    }
+
+    function updateProgress(level) {
+      steps.forEach((s, i) => {
+        s.classList.remove('active', 'done');
+        if (i + 1 < level) s.classList.add('done');
+        else if (i + 1 === level) s.classList.add('active');
+      });
+      levelLabel.textContent = level <= 3 ? `Level ${level} / 3` : 'Complete';
+    }
+
+    function startLevel(num) {
+      currentLevel = num;
+      updateProgress(num);
+
+      // Hide all levels + finish
+      levels.forEach(l => l.classList.remove('active'));
+      finishScreen.classList.remove('active');
+      transitionEl.classList.remove('active');
+
+      if (num === 1) { startLevel1(); }
+      else if (num === 2) { initLevel2(); levels[1].classList.add('active'); }
+      else if (num === 3) { initLevel3(); levels[2].classList.add('active'); }
+
+      // Start the demo comet guide for this level
+      startDemoComet(num);
+    }
+
+    function transitionToLevel(nextNum) {
+      stopTranslateLoop();
+      stopDemoComet();
+      const isFinish = nextNum > 3;
+      transitionText.textContent = isFinish ? 'All Levels Complete!' : 'Level Complete!';
+      transitionSub.textContent = isFinish ? 'Great job!' : 'Moving to next level...';
+      transitionEl.classList.add('active');
+
+      setTimeout(() => {
+        transitionEl.classList.remove('active');
+        if (isFinish) {
+          levels.forEach(l => l.classList.remove('active'));
+          updateProgress(4);
+          finishScreen.classList.add('active');
+        } else {
+          startLevel(nextNum);
+        }
+      }, 1500);
+    }
+
+    // --- Localized success animation (confetti within shape) ---
+    function playSuccessParticles(stageEl, rectData) {
+      const container = document.createElement('div');
+      container.className = 'selection-success';
+      // Position at center of the selection rect
+      const cx = rectData.x + rectData.w / 2;
+      const cy = rectData.y + rectData.h / 2;
+      container.style.left = cx + 'px';
+      container.style.top = cy + 'px';
+
+      const colors = ['#2FAE7A', '#6E64FC', '#4F8EF7', '#F5A623', '#3ec48f'];
+      const count = 18;
+
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'selection-success__particle';
+        const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+        const dist = 20 + Math.random() * Math.min(rectData.w, rectData.h) * 0.4;
+        const tx = Math.cos(angle) * dist;
+        const ty = Math.sin(angle) * dist;
+        const sz = 4 + Math.random() * 5;
+        p.style.width = sz + 'px';
+        p.style.height = sz + 'px';
+        p.style.background = colors[i % colors.length];
+        p.style.setProperty('--tx', tx + 'px');
+        p.style.setProperty('--ty', ty + 'px');
+        container.appendChild(p);
+      }
+
+      stageEl.style.position = 'relative';
+      stageEl.appendChild(container);
+      setTimeout(() => container.remove(), 900);
+    }
+
+    // --- LEVEL 1: User-triggered translate ---
+    const olTranslateEl = document.getElementById('ol-translate-text');
+    const olHotkeyInd = document.getElementById('ol-hotkey-indicator');
+    const olTranslateCaption = document.getElementById('ol-translate-caption');
+    let level1Triggered = false;
+
+    function olRenderChars(text, className) {
+      olTranslateEl.innerHTML = '';
+      text.split('').forEach((ch, i) => {
+        const span = document.createElement('span');
+        span.className = 'translate__char ' + className;
+        span.textContent = ch === ' ' ? '\u00A0' : ch;
+        span.style.transitionDelay = (i * 22) + 'ms';
+        olTranslateEl.appendChild(span);
+      });
+    }
+
+    function playLevel1Seq(seq, index, onComplete) {
+      if (index >= seq.length) {
+        if (onComplete) onComplete();
+        return;
+      }
+
+      if (index === 0) {
+        olRenderChars(seq[index], 'morphing');
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          olTranslateEl.querySelectorAll('.translate__char').forEach(c => {
+            c.classList.remove('morphing'); c.classList.add('revealed');
+          });
+        }));
+        translateLoopTimer = setTimeout(() => playLevel1Seq(seq, index + 1, onComplete), 1500);
+      } else {
+        const chars = olTranslateEl.querySelectorAll('.translate__char');
+        chars.forEach(c => { c.classList.remove('revealed'); c.classList.add('morphing'); });
+        
+        translateLoopTimer = setTimeout(() => {
+          olRenderChars(seq[index], 'morphing');
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            olTranslateEl.querySelectorAll('.translate__char').forEach(c => {
+              c.classList.remove('morphing'); c.classList.add('revealed');
+            });
+          }));
+          translateLoopTimer = setTimeout(() => playLevel1Seq(seq, index + 1, onComplete), 1500);
+        }, 400); 
+      }
+    }
+
+    function startLevel1() {
+      levels[0].classList.add('active');
+      level1Triggered = false;
+      olTranslateCaption.classList.remove('visible');
+      olHotkeyInd.classList.remove('visible', 'pressed');
+
+      stopTranslateLoop();
+      
+      const GIBBERISH_SEQ = ["&#^#&^$&#^$&^", "@#&^@##&@^$#&", "@($*(@*#&@(*&#*"];
+      playLevel1Seq(GIBBERISH_SEQ, 0, () => {
+        translateLoopTimer = setTimeout(() => olHotkeyInd.classList.add('visible'), 600);
+      });
+    }
+
+    // User clicks the hotkey indicator to trigger translation
+    olHotkeyInd.addEventListener('click', () => {
+      if (currentLevel !== 1 || level1Triggered || !overlayOpen) return;
+      level1Triggered = true;
+      stopDemoComet(); // stop the comet orbiting
+      runTranslateOnce();
+    });
+
+    function runTranslateOnce() {
+      if (!overlayOpen || currentLevel !== 1) return;
+
+      stopTranslateLoop();
+
+      // Phase 1: Press hotkey indicator
+      olHotkeyInd.classList.add('pressed');
+
+      // The Purple Wave
+      const stageEl = document.querySelector('#overlay-level-1 .demo-stage');
+      const ripple = document.createElement('div');
+      ripple.className = 'magic-ripple';
+      stageEl.appendChild(ripple);
+      
+      setTimeout(() => ripple.remove(), 1200);
+
+      // Phase 2: Blur out glyphs
+      const chars = olTranslateEl.querySelectorAll('.translate__char');
+      chars.forEach(c => { c.classList.remove('revealed'); c.classList.add('morphing'); });
+
+      // Phase 3 & 4: Swap to translated sequence
+      const ENGLISH_SEQ = ["Where is the artifact?", "The king hid it well.", "We must find it."];
+      translateLoopTimer = setTimeout(() => {
+        olHotkeyInd.classList.remove('pressed');
+        olTranslateCaption.classList.add('visible');
+        
+        playLevel1Seq(ENGLISH_SEQ, 0, () => {
+          // Phase 5: Advance to Level 2
+          translateLoopTimer = setTimeout(() => {
+            transitionToLevel(2);
+          }, 1000);
+        });
+      }, 700);
+    }
+
+    function stopTranslateLoop() {
+      if (translateLoopTimer) { clearTimeout(translateLoopTimer); translateLoopTimer = null; }
+    }
+
+    // --- LEVEL 2: Extract (drag-to-select) ---
+    let olExtractState = 'idle';
+
+    function initLevel2() {
+      olExtractState = 'idle';
+      const lines = document.querySelectorAll('#ol-extract-lines .extract__line');
+      lines.forEach(l => l.classList.remove('selected'));
+      document.getElementById('ol-extract-selection').classList.remove('visible');
+      document.getElementById('ol-extract-toast').classList.remove('visible');
+      document.getElementById('ol-extract-caption').classList.remove('visible');
+      document.getElementById('ol-extract-select-rect').classList.remove('active');
+    }
+
+    function playOlExtractResult() {
+      const lines = document.querySelectorAll('#ol-extract-lines .extract__line');
+      const frame = document.getElementById('ol-extract-frame');
+      const rectEl = document.getElementById('ol-extract-select-rect');
+      const rectBounds = {
+        x: parseInt(rectEl.style.left) || 0,
+        y: parseInt(rectEl.style.top) || 0,
+        w: parseInt(rectEl.style.width) || frame.offsetWidth,
+        h: parseInt(rectEl.style.height) || frame.offsetHeight,
+      };
+
+      lines.forEach((line, i) => {
+        setTimeout(() => line.classList.add('selected'), i * 80);
+      });
+      setTimeout(() => {
+        document.getElementById('ol-extract-selection').classList.add('visible');
+        playSuccessParticles(document.getElementById('ol-extract-stage'), rectBounds);
+      }, lines.length * 80);
+      setTimeout(() => {
+        document.getElementById('ol-extract-toast').classList.add('visible');
+        document.getElementById('ol-extract-caption').classList.add('visible');
+        olExtractState = 'done';
+        // Auto-advance after success
+        setTimeout(() => transitionToLevel(3), 1800);
+      }, lines.length * 80 + 300);
+    }
+
+    // --- LEVEL 3: Assist (drag-to-select) ---
+    let olAssistState = 'idle';
+
+    function initLevel3() {
+      olAssistState = 'idle';
+      const blocks = document.querySelectorAll('#ol-assist-blocks .assist__block');
+      blocks.forEach(b => { b.classList.add('glitched'); b.classList.remove('fixed'); });
+      document.getElementById('ol-assist-result').classList.remove('visible');
+      document.getElementById('ol-assist-caption').classList.remove('visible');
+      document.getElementById('ol-assist-select-rect').classList.remove('active');
+    }
+
+    function playOlAssistResult() {
+      const blocks = document.querySelectorAll('#ol-assist-blocks .assist__block');
+      const frame = document.getElementById('ol-assist-frame');
+      const rectEl = document.getElementById('ol-assist-select-rect');
+      const rectBounds = {
+        x: parseInt(rectEl.style.left) || 0,
+        y: parseInt(rectEl.style.top) || 0,
+        w: parseInt(rectEl.style.width) || frame.offsetWidth,
+        h: parseInt(rectEl.style.height) || frame.offsetHeight,
+      };
+
+      blocks.forEach(b => { b.classList.remove('glitched'); b.classList.add('fixed'); });
+      setTimeout(() => {
+        document.getElementById('ol-assist-result').classList.add('visible');
+        document.getElementById('ol-assist-caption').classList.add('visible');
+        playSuccessParticles(document.getElementById('ol-assist-stage'), rectBounds);
+        olAssistState = 'done';
+        // Auto-advance to finish after success
+        setTimeout(() => transitionToLevel(4), 1800);
+      }, 500);
+    }
+
+    // --- Shared drag-to-select utility for overlay levels ---
+    function initOverlayDragSelect({ frame, rect, getState, setState, onComplete }) {
+      if (!frame || !rect) return;
+      let isDragging = false;
+      let startX = 0, startY = 0;
+
+      function getPos(e) {
+        const fr = frame.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: Math.max(0, Math.min(clientX - fr.left, fr.width)),
+          y: Math.max(0, Math.min(clientY - fr.top, fr.height)),
+        };
+      }
+
+      function beginDrag(e) {
+        if (getState() === 'animating' || getState() === 'done') return;
+        e.preventDefault();
+        isDragging = true;
+        setState('dragging');
+        const pos = getPos(e);
+        startX = pos.x; startY = pos.y;
+        rect.style.left = startX + 'px';
+        rect.style.top = startY + 'px';
+        rect.style.width = '0';
+        rect.style.height = '0';
+        rect.classList.add('active');
+      }
+
+      function moveDrag(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        rect.style.left = Math.min(startX, pos.x) + 'px';
+        rect.style.top = Math.min(startY, pos.y) + 'px';
+        rect.style.width = Math.abs(pos.x - startX) + 'px';
+        rect.style.height = Math.abs(pos.y - startY) + 'px';
+      }
+
+      function endDrag() {
+        if (!isDragging) return;
+        isDragging = false;
+        const w = parseInt(rect.style.width) || 0;
+        const h = parseInt(rect.style.height) || 0;
+        if (w > 20 && h > 20) {
+          setState('animating');
+          setTimeout(() => { rect.classList.remove('active'); onComplete(); }, 200);
+        } else {
+          rect.classList.remove('active');
+          setState('idle');
+        }
+      }
+
+      frame.addEventListener('mousedown', beginDrag);
+      frame.addEventListener('touchstart', beginDrag, { passive: false });
+      document.addEventListener('mousemove', moveDrag);
+      document.addEventListener('touchmove', moveDrag, { passive: false });
+      document.addEventListener('mouseup', endDrag);
+      document.addEventListener('touchend', endDrag);
+
+      // Tap fallback for mobile
+      let tapTS = 0;
+      frame.addEventListener('pointerdown', () => { tapTS = Date.now(); });
+      frame.addEventListener('pointerup', () => {
+        if (Date.now() - tapTS < 200 && getState() === 'dragging') {
+          isDragging = false;
+          setState('animating');
+          const fr = frame.getBoundingClientRect();
+          const pad = 16;
+          rect.style.left = pad + 'px';
+          rect.style.top = pad + 'px';
+          rect.style.width = (fr.width - pad * 2) + 'px';
+          rect.style.height = (fr.height - pad * 2) + 'px';
+          rect.classList.add('active');
+          setTimeout(() => { rect.classList.remove('active'); onComplete(); }, 400);
+        }
+      });
+    }
+
+    // Init drag-select for overlay levels 2 and 3
+    initOverlayDragSelect({
+      frame: document.getElementById('ol-extract-frame'),
+      rect: document.getElementById('ol-extract-select-rect'),
+      getState: () => olExtractState,
+      setState: (s) => { olExtractState = s; },
+      onComplete: playOlExtractResult,
+    });
+
+    initOverlayDragSelect({
+      frame: document.getElementById('ol-assist-frame'),
+      rect: document.getElementById('ol-assist-select-rect'),
+      getState: () => olAssistState,
+      setState: (s) => { olAssistState = s; },
+      onComplete: playOlAssistResult,
+    });
+
+    // --- Overlay open/close wiring ---
+    document.getElementById('try-product-btn').addEventListener('click', openOverlay);
+    document.getElementById('header-demo-btn').addEventListener('click', (e) => { e.preventDefault(); openOverlay(); });
+    document.getElementById('hero-demo-btn').addEventListener('click', (e) => { e.preventDefault(); openOverlay(); });
+    document.getElementById('overlay-close').addEventListener('click', closeOverlay);
+    document.getElementById('overlay-finish-btn').addEventListener('click', closeOverlay);
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlayOpen) closeOverlay();
+    });
+
+    /* =============================================
+       DEMO OVERLAY COMET — per-level guide paths
+       ============================================= */
+    const demoCometCanvas = document.getElementById('demo-comet-canvas');
+    let demoCometCtx = null;
+    let demoCometAnimId = null;
+    let demoCometLevel = 0;
+    let demoCometTime = 0;
+    let demoCometAlpha = 0; // fade in/out
+    let demoCometTrail = [];
+    let demoCometParticles = [];
+    const DEMO_TRAIL_LEN = 22;
+    const DEMO_MAX_PARTICLES = 40;
+    let dcW = 0, dcH = 0;
+
+    function resizeDemoComet() {
+      if (!demoCometCanvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = demoCometCanvas.parentElement.getBoundingClientRect();
+      dcW = rect.width;
+      dcH = rect.height;
+      demoCometCanvas.width = dcW * dpr;
+      demoCometCanvas.height = dcH * dpr;
+      demoCometCanvas.style.width = dcW + 'px';
+      demoCometCanvas.style.height = dcH + 'px';
+    }
+
+    if (demoCometCanvas) {
+      demoCometCtx = demoCometCanvas.getContext('2d');
+      window.addEventListener('resize', resizeDemoComet);
+    }
+
+    /**
+     * Compute the comet's position for the current level.
+     * Returns { x, y } in overlay-canvas coordinates.
+     */
+    function getDemoCometPos(level, t) {
+      let targetEl = null;
+      let path = { x: dcW / 2, y: dcH / 2 };
+
+      if (level === 1) {
+        // Orbit around the hotkey indicator button
+        targetEl = document.getElementById('ol-hotkey-indicator');
+        if (targetEl) {
+          const r = targetEl.getBoundingClientRect();
+          const overlayR = demoCometCanvas.getBoundingClientRect();
+          const cx = r.left - overlayR.left + r.width / 2;
+          const cy = r.top - overlayR.top + r.height / 2;
+          const rx = r.width * 1.1 + 30;
+          const ry = r.height * 0.8 + 20;
+          const angle = t * 1.8; // orbit speed
+          path = {
+            x: cx + Math.cos(angle) * rx,
+            y: cy + Math.sin(angle) * ry,
+          };
+        }
+      } else if (level === 2) {
+        // Sweep around the extract text block in a rounded rectangle path
+        targetEl = document.getElementById('ol-extract-lines');
+        if (targetEl) {
+          const r = targetEl.getBoundingClientRect();
+          const overlayR = demoCometCanvas.getBoundingClientRect();
+          const cx = r.left - overlayR.left + r.width / 2;
+          const cy = r.top - overlayR.top + r.height / 2;
+          const hw = r.width / 2 + 28;
+          const hh = r.height / 2 + 22;
+          // Parameterized rounded rectangle
+          const p = (t * 0.8) % (Math.PI * 2);
+          const cornerR = 20;
+          // Use superellipse for rounded rect feel
+          const n = 3.5; // roundedness (higher = more rectangular)
+          const cosP = Math.cos(p);
+          const sinP = Math.sin(p);
+          const sgnCos = Math.sign(cosP);
+          const sgnSin = Math.sign(sinP);
+          path = {
+            x: cx + sgnCos * hw * Math.pow(Math.abs(cosP), 2 / n),
+            y: cy + sgnSin * hh * Math.pow(Math.abs(sinP), 2 / n),
+          };
+        }
+      } else if (level === 3) {
+        // Figure-8 zigzag through glitched blocks
+        targetEl = document.getElementById('ol-assist-blocks');
+        if (targetEl) {
+          const r = targetEl.getBoundingClientRect();
+          const overlayR = demoCometCanvas.getBoundingClientRect();
+          const cx = r.left - overlayR.left + r.width / 2;
+          const cy = r.top - overlayR.top + r.height / 2;
+          const hw = r.width / 2 + 20;
+          const hh = r.height / 2 + 16;
+          // Lissajous figure-8
+          const speed = t * 1.2;
+          path = {
+            x: cx + Math.sin(speed) * hw,
+            y: cy + Math.sin(speed * 2) * hh * 0.6,
+          };
+        }
+      }
+
+      return path;
+    }
+
+    function emitDemoCometParticle(x, y) {
+      if (demoCometParticles.length >= DEMO_MAX_PARTICLES) return;
+      const angle = Math.random() * Math.PI * 2;
+      const drift = 0.2 + Math.random() * 0.5;
+      demoCometParticles.push({
+        x: x + (Math.random() - 0.5) * 6,
+        y: y + (Math.random() - 0.5) * 6,
+        vx: Math.cos(angle) * drift,
+        vy: Math.sin(angle) * drift,
+        life: 1.0,
+        decay: 0.02 + Math.random() * 0.02,
+        size: 0.8 + Math.random() * 1.5,
+        hue: 230 + Math.random() * 40,
+      });
+    }
+
+    function drawDemoComet() {
+      if (!demoCometCtx || !overlayOpen || demoCometLevel === 0) {
+        demoCometAnimId = null;
+        return;
+      }
+
+      const dpr = window.devicePixelRatio || 1;
+      const ctx = demoCometCtx;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, dcW, dcH);
+
+      // Fade in
+      demoCometAlpha = Math.min(demoCometAlpha + 0.025, 1.0);
+      demoCometTime += 0.016; // ~60fps time step
+
+      const pos = getDemoCometPos(demoCometLevel, demoCometTime);
+
+      // Update trail
+      demoCometTrail.push({ x: pos.x, y: pos.y });
+      if (demoCometTrail.length > DEMO_TRAIL_LEN) demoCometTrail.shift();
+
+      const masterAlpha = demoCometAlpha;
+      ctx.globalAlpha = masterAlpha;
+
+      // --- Draw trail ---
+      for (let i = 1; i < demoCometTrail.length; i++) {
+        const t = i / demoCometTrail.length;
+        const prev = demoCometTrail[i - 1];
+        const curr = demoCometTrail[i];
+        const a = t * t * 0.45;
+        const w = 0.8 + t * 3;
+        const r = Math.round(80 + 30 * t);
+        const g = Math.round(75 + 70 * t);
+        const b = Math.round(220 + 32 * (1 - t));
+
+        ctx.beginPath();
+        ctx.moveTo(prev.x, prev.y);
+        ctx.lineTo(curr.x, curr.y);
+        ctx.strokeStyle = `rgba(${r},${g},${b},${a})`;
+        ctx.lineWidth = w;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      }
+
+      // --- Stardust particles ---
+      emitDemoCometParticle(pos.x, pos.y);
+      for (let i = demoCometParticles.length - 1; i >= 0; i--) {
+        const p = demoCometParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.96;
+        p.vy *= 0.96;
+        p.life -= p.decay;
+        if (p.life <= 0) { demoCometParticles.splice(i, 1); continue; }
+        const pa = p.life * p.life * masterAlpha * 0.6;
+        const psz = p.size * p.life;
+        // Glow
+        const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, psz * 2.5);
+        grd.addColorStop(0, `hsla(${p.hue}, 75%, 75%, ${pa * 0.4})`);
+        grd.addColorStop(1, `hsla(${p.hue}, 75%, 75%, 0)`);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, psz * 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = grd;
+        ctx.fill();
+        // Core
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, psz, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${p.hue}, 60%, 90%, ${pa})`;
+        ctx.fill();
+      }
+
+      // --- Energy ring ---
+      const ringPulse = 0.7 + 0.3 * Math.sin(Date.now() * 0.005);
+      const ringSize = 10 + 4 * ringPulse;
+      const ringTilt = 0.35 + 0.1 * Math.sin(Date.now() * 0.003);
+      const ringAlpha = (0.2 + 0.15 * ringPulse) * masterAlpha;
+
+      ctx.save();
+      ctx.translate(pos.x, pos.y);
+      ctx.rotate(demoCometTime * 2.5);
+      ctx.scale(1, ringTilt);
+      ctx.beginPath();
+      ctx.arc(0, 0, ringSize, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(130, 120, 255, ${ringAlpha})`;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, 0, ringSize * 0.6, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(180, 170, 255, ${ringAlpha * 0.35})`;
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+      ctx.restore();
+
+      // --- Head glow ---
+      const g1 = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, 22);
+      g1.addColorStop(0, 'rgba(110,100,252,0.45)');
+      g1.addColorStop(0.35, 'rgba(79,142,247,0.15)');
+      g1.addColorStop(1, 'rgba(79,142,247,0)');
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 22, 0, Math.PI * 2);
+      ctx.fillStyle = g1;
+      ctx.fill();
+
+      // --- Head core ---
+      const g2 = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, 4);
+      g2.addColorStop(0, 'rgba(255,255,255,0.95)');
+      g2.addColorStop(0.45, 'rgba(175,165,255,0.6)');
+      g2.addColorStop(1, 'rgba(110,100,252,0)');
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = g2;
+      ctx.fill();
+
+      ctx.globalAlpha = 1;
+
+      demoCometAnimId = requestAnimationFrame(drawDemoComet);
+    }
+
+    function startDemoComet(level) {
+      stopDemoComet();
+      demoCometLevel = level;
+      demoCometTime = 0;
+      demoCometAlpha = 0;
+      demoCometTrail = [];
+      demoCometParticles = [];
+      resizeDemoComet();
+      // Delay start slightly so the level UI has settled
+      setTimeout(() => {
+        if (overlayOpen && currentLevel === level) {
+          demoCometAnimId = requestAnimationFrame(drawDemoComet);
+        }
+      }, 300);
+    }
+
+    function stopDemoComet() {
+      if (demoCometAnimId) {
+        cancelAnimationFrame(demoCometAnimId);
+        demoCometAnimId = null;
+      }
+      demoCometLevel = 0;
+      demoCometTrail = [];
+      demoCometParticles = [];
+      // Clear canvas
+      if (demoCometCtx && dcW > 0) {
+        const dpr = window.devicePixelRatio || 1;
+        demoCometCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        demoCometCtx.clearRect(0, 0, dcW, dcH);
+      }
+    }
+
+    /* =============================================
+       PRICING — Tier 3 AI Credits toggle
+       ============================================= */
+    const tier3Price = document.getElementById('tier3-price');
+    const btnTier3 = document.getElementById('btn-tier3');
+    const creditsOpts = document.querySelectorAll('#credits-toggle .credits-toggle__opt');
+
+    // Function to safely bind URLs. If URL is empty, it prevents navigation.
+    function bindUrl(elementId, url) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        
+        if (url && url.trim() !== "") {
+            el.href = url;
+            el.onclick = null;
+        } else {
+            el.href = "#";
+            el.onclick = (e) => {
+                e.preventDefault();
+                console.log(`Link for ${elementId} is not configured yet.`);
+            };
+        }
+    }
+
+    // Bind Pricing Buttons
+    bindUrl('btn-tier1', CONFIG.LEMONSQUEEZY_CHECKOUT_URL_TIER1);
+    bindUrl('btn-tier2', CONFIG.LEMONSQUEEZY_CHECKOUT_URL_TIER2);
+    bindUrl('btn-tier3', CONFIG.LEMONSQUEEZY_CHECKOUT_URL_TIER3_BASE);
+
+    creditsOpts.forEach(opt => {
+      opt.addEventListener('click', () => {
+        creditsOpts.forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+
+        const is5m = opt.dataset.credits === '5m';
+
+        // Animate price change
+        tier3Price.style.opacity = '0';
+        setTimeout(() => {
+          tier3Price.textContent = is5m ? '$50' : '$30';
+          tier3Price.style.opacity = '1';
+        }, 200);
+
+        // Safely update checkout URL
+        const newUrl = is5m ? CONFIG.LEMONSQUEEZY_CHECKOUT_URL_TIER3_PLUS : CONFIG.LEMONSQUEEZY_CHECKOUT_URL_TIER3_BASE;
+        if (newUrl && newUrl.trim() !== "") {
+            btnTier3.href = newUrl;
+            btnTier3.onclick = null;
+        } else {
+            btnTier3.href = "#";
+            btnTier3.onclick = (e) => e.preventDefault();
+        }
+      });
+    });
+
+    /* =============================================
+       FINAL CTA — wire primary button + email form
+       ============================================= */
+    bindUrl('cta-primary-btn', CONFIG.LEMONSQUEEZY_CHECKOUT_URL_TIER2);
+
+    const emailForm = document.getElementById('email-form');
+    const emailWrap = document.getElementById('email-form-wrap');
+
+    emailForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = emailForm.querySelector('input[name="email"]');
+      const email = input.value.trim();
+      
+      if (!email || !input.checkValidity()) {
+        input.focus();
+        return;
+      }
+
+      const submitBtn = emailForm.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn.textContent;
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+
+      if (CONFIG.EMAIL_FORM_ENDPOINT && CONFIG.EMAIL_FORM_ENDPOINT.trim() !== "") {
+        try {
+          // Loops expects URL-encoded form data, not JSON
+          const formData = new URLSearchParams();
+          formData.append('email', email);
+
+          const response = await fetch(CONFIG.EMAIL_FORM_ENDPOINT, {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          });
+
+          if (response.ok) {
+             emailWrap.innerHTML = '<p class="cta__email-success">Thanks — we\'ll email you when it\'s live.</p>';
+          } else {
+             throw new Error('Network response was not ok.');
+          }
+        } catch (error) {
+          console.error('Error submitting email:', error);
+          submitBtn.textContent = 'Error. Try again';
+          submitBtn.disabled = false;
+          setTimeout(() => {
+              submitBtn.textContent = originalBtnText;
+          }, 3000);
+        }
+      } else {
+        console.log('Form submission simulated. Endpoint not configured.');
+        // Simulate success if endpoint is missing
+        setTimeout(() => {
+           emailWrap.innerHTML = '<p class="cta__email-success">Thanks — we\'ll email you when it\'s live.</p>';
+        }, 500);
+      }
+    });
+
+    /* =============================================
+       FOOTER — wire connector URLs
+       ============================================= */
+    bindUrl('footer-feedback', CONFIG.FEEDBACK_FORM_URL);
+    bindUrl('social-twitter', CONFIG.TWITTER_URL);
+    bindUrl('social-telegram', CONFIG.TELEGRAM_URL);
+
+    /* Footer "Follow" popup toggle */
+    const followBtn = document.getElementById('follow-btn');
+    const followPopup = document.getElementById('follow-popup');
+
+    followBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = followPopup.classList.toggle('open');
+      followBtn.classList.toggle('open', isOpen);
+    });
+
+    // Close popup when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!followPopup.contains(e.target) && e.target !== followBtn) {
+        followPopup.classList.remove('open');
+        followBtn.classList.remove('open');
+      }
+    });
+
+    /* =============================================
+       STARRY BACKGROUND — canvas-based stars
+       ============================================= */
+    function createStarfield(canvasId, starCount) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return null;
+      const ctx = canvas.getContext('2d');
+      let stars = [];
+      let w = 0, h = 0;
+
+      function resize() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        w = rect.width;
+        h = rect.height;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function populate() {
+        stars = [];
+        for (let i = 0; i < starCount; i++) {
+          stars.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * 1.6 + 0.3,
+            baseA: Math.random() * 0.45 + 0.15,
+            twinkle: Math.random() * 0.015 + 0.004,
+            dx: (Math.random() - 0.5) * 0.12,
+            dy: (Math.random() - 0.5) * 0.08,
+            phase: Math.random() * Math.PI * 2,
+          });
+        }
+      }
+
+      resize();
+      populate();
+      window.addEventListener('resize', () => { resize(); populate(); });
+
+      let tick = 0;
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        for (const s of stars) {
+          s.x += s.dx;
+          s.y += s.dy;
+          if (s.x < -4) s.x = w + 4;
+          if (s.x > w + 4) s.x = -4;
+          if (s.y < -4) s.y = h + 4;
+          if (s.y > h + 4) s.y = -4;
+          const flicker = Math.sin(tick * s.twinkle + s.phase) * 0.3 + 0.7;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,255,${s.baseA * flicker})`;
+          ctx.fill();
+        }
+        tick++;
+      }
+      return { draw };
+    }
+
+    /* =============================================
+       3D DRUM PLANET CAROUSEL
+       ============================================= */
+    const planetsCanvas = document.getElementById('planets-canvas');
+    const planetTooltip = document.getElementById('planet-tooltip');
+    let planetsCtx = null;
+
+    /* --- Carousel state --- */
+    let drumAngle = 0;              // current rotation of the drum (radians)
+    let drumVelocity = 0.004;       // auto-rotation speed (rad/frame)
+    const DRUM_AUTO_SPEED = 0.004;
+    let drumDragging = false;
+    let drumLastX = 0;
+    let drumInertia = 0;            // momentum after drag release
+    let drumHovered = null;
+    let drumHoverScale = {};        // per-planet animated hover scale
+    let drumPaused = false;         // true when hovered
+    let canvasW = 0, canvasH = 0;   // logical (CSS) canvas size
+
+    /* --- Planet definitions --- */
+    const PLANETS = [
+      { name: 'Vexora',  size: 30, locked: false },
+      { name: 'soon...', size: 17, locked: true },
+      { name: 'soon...', size: 20, locked: true },
+      { name: 'soon...', size: 15, locked: true },
+      { name: 'soon...', size: 22, locked: true },
+      { name: 'soon...', size: 18, locked: true },
+      { name: 'soon...', size: 21, locked: true },
+      { name: 'soon...', size: 24, locked: true },
+    ];
+
+    /* Evenly distribute planets around the cylinder */
+    const PLANET_COUNT = PLANETS.length;
+    for (let i = 0; i < PLANET_COUNT; i++) {
+      PLANETS[i].baseAngle = (i / PLANET_COUNT) * Math.PI * 2;
+      drumHoverScale[i] = 1.0;
+    }
+
+    /* --- 3D Cylinder parameters --- */
+    const DRUM_RADIUS_FACTOR = 0.38; // fraction of canvas width
+    const PERSPECTIVE = 800;          // perspective distance (px feel)
+    const Y_OFFSET_FACTOR = 0.0;     // vertical shift as fraction of height (0 = centered)
+
+    function initPlanets() {
+      if (!planetsCanvas) return;
+      planetsCtx = planetsCanvas.getContext('2d');
+      resizePlanets();
+      window.addEventListener('resize', resizePlanets);
+
+      /* --- Pointer: drag to rotate --- */
+      planetsCanvas.addEventListener('pointerdown', (e) => {
+        drumDragging = true;
+        drumLastX = e.clientX;
+        drumInertia = 0;
+        planetsCanvas.setPointerCapture(e.pointerId);
+      });
+
+      planetsCanvas.addEventListener('pointermove', (e) => {
+        const rect = planetsCanvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        const mx = (e.clientX - rect.left) * (canvasW / rect.width);
+        const my = (e.clientY - rect.top)  * (canvasH / rect.height);
+
+        /* --- Hit-test all planets --- */
+        drumHovered = null;
+        for (let i = 0; i < PLANET_COUNT; i++) {
+          const p = PLANETS[i];
+          const pos = getPlanetPos(p, i);
+          if (!pos) continue;
+          const hitR = pos.drawSize + 12;
+          if (Math.hypot(mx - pos.x, my - pos.y) < hitR) {
+            drumHovered = i;
+            const label = p.locked
+              ? '<span style="opacity:0.6">🔒</span> soon...'
+              : '<span style="color:var(--color-green);font-weight:600">Vexora</span>';
+            planetTooltip.innerHTML = label;
+            planetTooltip.style.left = (e.clientX + 16) + 'px';
+            planetTooltip.style.top  = (e.clientY - 42) + 'px';
+            planetTooltip.classList.add('visible');
+            break;
+          }
+        }
+        if (drumHovered === null) {
+          planetTooltip.classList.remove('visible');
+        }
+        drumPaused = (drumHovered !== null);
+
+        /* --- Drag rotation --- */
+        if (drumDragging) {
+          const dx = e.clientX - drumLastX;
+          drumInertia = dx * 0.008;
+          drumAngle += drumInertia;
+          drumLastX = e.clientX;
+        }
+      });
+
+      planetsCanvas.addEventListener('pointerup', () => {
+        drumDragging = false;
+        // inertia is carried in drumInertia and decays in drawPlanets
+      });
+
+      planetsCanvas.addEventListener('pointerleave', () => {
+        planetTooltip.classList.remove('visible');
+        drumHovered = null;
+        drumPaused = false;
+      });
+    }
+
+    function resizePlanets() {
+      if (!planetsCanvas) return;
+      const wrap = planetsCanvas.parentElement;
+      const rect = wrap.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const dpr = window.devicePixelRatio || 1;
+      planetsCanvas.width  = w * dpr;
+      planetsCanvas.height = h * dpr;
+      planetsCanvas.style.width  = w + 'px';
+      planetsCanvas.style.height = h + 'px';
+      canvasW = w;
+      canvasH = h;
+    }
+
+    /**
+     * Compute the projected 2D position & scale of a planet on the 3D drum.
+     * The drum is a horizontal cylinder: planets rotate around the Y-axis.
+     */
+    // 2.5D tilt: pitch tilts the drum forward, yaw tilts it sideways
+    const TILT_PITCH = 0.18;   // forward tilt — higher = more vertical spread
+
+    function getPlanetPos(planet, index) {
+      const angle = planet.baseAngle + drumAngle;
+      const drumRadius = canvasW * DRUM_RADIUS_FACTOR;
+      const cx = canvasW / 2;
+      const cy = canvasH / 2 + canvasH * Y_OFFSET_FACTOR;
+
+      // 3D coordinates (right-hand, Y-up, Z toward viewer)
+      const x3d = Math.sin(angle) * drumRadius;  // left-right
+      const z3d = Math.cos(angle) * drumRadius;   // depth (1 = near, -1 = far)
+
+      // Perspective projection
+      const viewDist = PERSPECTIVE;
+      const scale = viewDist / (viewDist - z3d);
+
+      // Scale planet size based on viewport so it looks good on all screens
+      const sizeScale = Math.max(canvasW / 720, 0.55);
+
+      const x2d = cx + Math.sin(angle) * drumRadius;
+      // 2.5D tilt: track perfectly along the line
+      const y2d = cy + Math.cos(angle) * drumRadius * TILT_PITCH;
+
+      // Depth value normalized 0..1 (0 = far back, 1 = front)
+      const depthNorm = (z3d + drumRadius) / (2 * drumRadius);
+
+      // Hover scale animation
+      const targetHover = (drumHovered === index) ? 1.35 : 1.0;
+      drumHoverScale[index] += (targetHover - drumHoverScale[index]) * 0.12;
+
+      const drawSize = planet.size * scale * sizeScale * drumHoverScale[index];
+
+      return { x: x2d, y: y2d, scale, drawSize, depthNorm, z3d, angle };
+    }
+
+    const planetLogo = new Image();
+    planetLogo.src = './logo.png';
+
+    function drawPlanets() {
+      if (!planetsCtx) return;
+      const dpr = window.devicePixelRatio || 1;
+      const ctx = planetsCtx;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, canvasW, canvasH);
+
+      /* --- Auto-rotation & inertia --- */
+      if (!drumDragging && !drumPaused) {
+        // Decay inertia
+        drumInertia *= 0.95;
+        if (Math.abs(drumInertia) > 0.0002) {
+          drumAngle += drumInertia;
+        } else {
+          drumInertia = 0;
+          drumAngle += DRUM_AUTO_SPEED;
+        }
+      } else if (!drumDragging && drumPaused) {
+        // Hovered but not dragging — decay inertia only
+        drumInertia *= 0.92;
+        if (Math.abs(drumInertia) > 0.0002) {
+          drumAngle += drumInertia;
+        }
+      }
+
+      /* --- Draw subtle drum track/guide ellipse (tilted to match 2.5D orbit) --- */
+      const cx = canvasW / 2;
+      const cy = canvasH / 2 + canvasH * Y_OFFSET_FACTOR;
+      const drumRadius = canvasW * DRUM_RADIUS_FACTOR;
+      
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, drumRadius, drumRadius * TILT_PITCH, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      /* --- Compute all positions, then depth-sort --- */
+      const items = [];
+      for (let i = 0; i < PLANET_COUNT; i++) {
+        const pos = getPlanetPos(PLANETS[i], i);
+        if (pos) items.push({ planet: PLANETS[i], index: i, pos });
+      }
+      // Sort back-to-front (lowest z3d first = furthest away drawn first)
+      items.sort((a, b) => a.pos.z3d - b.pos.z3d);
+
+      /* --- Render planets --- */
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      for (const item of items) {
+        const { planet: p, index: idx, pos } = item;
+        const { x, y, drawSize, depthNorm } = pos;
+
+        // Opacity: rear planets are dimmer
+        const alpha = 0.25 + 0.75 * depthNorm;
+        const isHovered = (drumHovered === idx);
+
+        if (p.locked) {
+          /* --- Locked planet (dark body + lock icon) --- */
+          // Subtle shadow for depth
+          ctx.save();
+          ctx.globalAlpha = alpha;
+
+          // Planet body
+          ctx.beginPath();
+          ctx.arc(x, y, drawSize, 0, Math.PI * 2);
+          ctx.fillStyle = isLight ? '#f0f0f0' : '#0c0c14';
+          ctx.fill();
+
+          // Border ring
+          const borderAlpha = isHovered ? 0.25 : (0.06 + 0.06 * depthNorm);
+          ctx.strokeStyle = isLight 
+            ? `rgba(0,0,0,${borderAlpha})` 
+            : `rgba(255,255,255,${borderAlpha})`;
+          ctx.lineWidth = isHovered ? 1.8 : 1;
+          ctx.stroke();
+
+          // Lock icon (only if big enough to see)
+          if (drawSize > 8) {
+            const ls = drawSize * 0.4;
+            const iconAlpha = 0.25 + 0.15 * depthNorm;
+            ctx.strokeStyle = isLight ? `rgba(0,0,0,${iconAlpha})` : `rgba(255,255,255,${iconAlpha})`;
+            ctx.lineWidth = 1.2;
+            // Shackle
+            ctx.beginPath();
+            ctx.arc(x, y - ls * 0.2, ls * 0.3, Math.PI, 0);
+            ctx.stroke();
+            // Body
+            const bodyAlpha = 0.08 + 0.06 * depthNorm;
+            ctx.fillStyle = isLight ? `rgba(0,0,0,${bodyAlpha})` : `rgba(255,255,255,${bodyAlpha})`;
+            ctx.beginPath();
+            ctx.roundRect(x - ls * 0.38, y - ls * 0.05, ls * 0.76, ls * 0.58, 2);
+            ctx.fill();
+            const bodyBorderAlpha = 0.12 + 0.06 * depthNorm;
+            ctx.strokeStyle = isLight ? `rgba(0,0,0,${bodyBorderAlpha})` : `rgba(255,255,255,${bodyBorderAlpha})`;
+            ctx.stroke();
+          }
+
+          ctx.restore();
+        } else {
+          /* --- Vexora planet (green glow + body + V mark) --- */
+          ctx.save();
+          ctx.globalAlpha = Math.max(alpha, 0.6); // Vexora stays vivid even at back
+
+          // Outer glow
+          const glowR = drawSize * 3;
+          const grd = ctx.createRadialGradient(x, y, drawSize * 0.3, x, y, glowR);
+          grd.addColorStop(0, `rgba(47,174,122,${0.35 * alpha})`);
+          grd.addColorStop(0.5, `rgba(47,174,122,${0.1 * alpha})`);
+          grd.addColorStop(1, 'rgba(47,174,122,0)');
+          ctx.beginPath();
+          ctx.arc(x, y, glowR, 0, Math.PI * 2);
+          ctx.fillStyle = grd;
+          ctx.fill();
+
+          // Pulse ring
+          const pulse = 0.5 + 0.5 * Math.sin(Date.now() * 0.003);
+          ctx.beginPath();
+          ctx.arc(x, y, drawSize + 5 + pulse * 5, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(47,174,122,${(0.18 + pulse * 0.12) * alpha})`;
+          ctx.lineWidth = 1.8;
+          ctx.stroke();
+
+          // Body gradient
+          const bg = ctx.createRadialGradient(
+            x - drawSize * 0.25, y - drawSize * 0.25, 0,
+            x, y, drawSize
+          );
+          bg.addColorStop(0, '#3ec48f');
+          bg.addColorStop(1, '#28996c');
+          ctx.beginPath();
+          ctx.arc(x, y, drawSize, 0, Math.PI * 2);
+          ctx.fillStyle = bg;
+          ctx.fill();
+
+          // Hover ring boost
+          if (isHovered) {
+            ctx.beginPath();
+            ctx.arc(x, y, drawSize + 2, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(62, 196, 143, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          }
+
+          // Actual logo.png image
+          if (drawSize > 10 && planetLogo.complete) {
+            const logoSize = drawSize * 1.2;
+            ctx.drawImage(planetLogo, x - logoSize / 2, y - logoSize / 2, logoSize, logoSize);
+          }
+
+          // Store Vexora screen position for comet system
+          window.__vexoraScreenPos = {
+            x: planetsCanvas.getBoundingClientRect().left + x,
+            y: planetsCanvas.getBoundingClientRect().top + y,
+          };
+
+          ctx.restore();
+        }
+      }
+    }
+
+    initPlanets();
+
+    /* =============================================
+       ANIMATION LOOP — stars + planets
+       ============================================= */
+    const heroStars = createStarfield('hero-stars', 180);
+    const ctaStars = createStarfield('cta-stars', 120);
+
+    function mainLoop() {
+      if (heroStars) heroStars.draw();
+      if (ctaStars) ctaStars.draw();
+      drawPlanets();
+      requestAnimationFrame(mainLoop);
+    }
+    mainLoop();
+
+    /* =============================================
+       INTERACTIVE COMET — scroll-driven
+       ============================================= */
+    (function initComet() {
+      const cCanvas = document.getElementById('comet-canvas');
+      if (!cCanvas) return;
+      const cCtx = cCanvas.getContext('2d');
+      let cW = 0, cH = 0;
+      const trail = [];
+      const TRAIL_LEN = 55;
+
+      function resizeComet() {
+        const dpr = window.devicePixelRatio || 1;
+        cW = window.innerWidth;
+        cH = window.innerHeight;
+        cCanvas.width = cW * dpr;
+        cCanvas.height = cH * dpr;
+        cCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      resizeComet();
+      window.addEventListener('resize', resizeComet);
+
+      // Catmull-Rom spline for smooth path
+      function catmullRom(p0, p1, p2, p3, t) {
+        const t2 = t * t, t3 = t2 * t;
+        return 0.5 * ((2*p1) + (-p0+p2)*t + (2*p0-5*p1+4*p2-p3)*t2 + (-p0+3*p1-3*p2+p3)*t3);
+      }
+
+      function splinePoint(pts, t) {
+        const n = pts.length - 1;
+        const seg = Math.min(Math.floor(t * n), n - 1);
+        const lt = t * n - seg;
+        const i0 = Math.max(seg - 1, 0);
+        const i1 = seg;
+        const i2 = Math.min(seg + 1, n);
+        const i3 = Math.min(seg + 2, n);
+        return {
+          x: catmullRom(pts[i0].x, pts[i1].x, pts[i2].x, pts[i3].x, lt),
+          y: catmullRom(pts[i0].y, pts[i1].y, pts[i2].y, pts[i3].y, lt),
+        };
+      }
+
+      // Waypoints as viewport fractions
+      const WAYPOINTS = [
+        { x: 0.50, y: 0.48 },
+        { x: 0.62, y: 0.22 },
+        { x: 0.82, y: 0.38 },
+        { x: 0.72, y: 0.62 },
+        { x: 0.35, y: 0.40 },
+        { x: 0.18, y: 0.58 },
+        { x: 0.38, y: 0.32 },
+        { x: 0.75, y: 0.52 },
+        { x: 0.60, y: 0.68 },
+        { x: 0.50, y: 0.45 },
+      ];
+
+      /* ---- Inertia-based scroll physics ---- */
+      let scrollProgress = 0;    // smoothed value used for rendering
+      let scrollVelocity = 0;    // current velocity (rad/frame equivalent)
+      let targetProgress = 0;    // raw scroll target
+      let prevTarget = 0;        // previous frame's target (for velocity calc)
+      const SCROLL_STIFFNESS = 0.045;  // spring pull toward target
+      const SCROLL_DAMPING   = 0.82;   // velocity decay (lower = more glide)
+      let cometVisible = false;
+
+      window.addEventListener('scroll', () => {
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        targetProgress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+        cometVisible = window.scrollY > 80;
+      }, { passive: true });
+
+      /* ---- Stardust particle system ---- */
+      const stardustParticles = [];
+      const MAX_STARDUST = 80;
+
+      function emitStardust(cx, cy, speed) {
+        // Emit 1-3 particles per frame depending on speed
+        const count = Math.min(3, Math.max(1, Math.round(speed * 120)));
+        for (let i = 0; i < count; i++) {
+          if (stardustParticles.length >= MAX_STARDUST) break;
+          const angle = Math.random() * Math.PI * 2;
+          const drift = 0.3 + Math.random() * 0.8;
+          stardustParticles.push({
+            x: cx + (Math.random() - 0.5) * 8,
+            y: cy + (Math.random() - 0.5) * 8,
+            vx: Math.cos(angle) * drift - speed * 40,
+            vy: Math.sin(angle) * drift,
+            life: 1.0,
+            decay: 0.012 + Math.random() * 0.015,
+            size: 1.0 + Math.random() * 2.2,
+            hue: 230 + Math.random() * 40, // blue-purple range
+          });
+        }
+      }
+
+      function updateAndDrawStardust(ctx, alpha) {
+        for (let i = stardustParticles.length - 1; i >= 0; i--) {
+          const p = stardustParticles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vx *= 0.97;
+          p.vy *= 0.97;
+          p.life -= p.decay;
+          if (p.life <= 0) {
+            stardustParticles.splice(i, 1);
+            continue;
+          }
+          const a = p.life * p.life * alpha * 0.7;
+          const sz = p.size * p.life;
+          // Glow
+          const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, sz * 3);
+          grd.addColorStop(0, `hsla(${p.hue}, 75%, 75%, ${a * 0.5})`);
+          grd.addColorStop(1, `hsla(${p.hue}, 75%, 75%, 0)`);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, sz * 3, 0, Math.PI * 2);
+          ctx.fillStyle = grd;
+          ctx.fill();
+          // Core
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, sz, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${p.hue}, 60%, 90%, ${a})`;
+          ctx.fill();
+        }
+      }
+
+      // Check if comet overlaps a solid section (for opacity)
+      function getCometSectionOpacity(screenY) {
+        const ids = ['pain', 'demo', 'how-it-works', 'privacy-trust', 'pricing'];
+        for (const id of ids) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          const r = el.getBoundingClientRect();
+          if (screenY > r.top + 30 && screenY < r.bottom - 30) return 0.08;
+        }
+        return 1.0;
+      }
+
+      /* ---- Energy ring state ---- */
+      let ringAngle = 0;
+
+      function drawComet() {
+        /* ---- Inertia scroll physics ---- */
+        // Compute velocity from target change + spring force
+        const springForce = (targetProgress - scrollProgress) * SCROLL_STIFFNESS;
+        scrollVelocity += springForce;
+        scrollVelocity *= SCROLL_DAMPING;
+        scrollProgress += scrollVelocity;
+        // Clamp
+        scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+        const speed = Math.abs(scrollVelocity);
+
+        cCtx.clearRect(0, 0, cW, cH);
+
+        if (!cometVisible && scrollProgress < 0.01) return;
+
+        const pos = splinePoint(WAYPOINTS, Math.min(scrollProgress, 0.999));
+        const cx = pos.x * cW;
+        const cy = pos.y * cH;
+
+        // Update trail
+        trail.push({ x: cx, y: cy });
+        if (trail.length > TRAIL_LEN) trail.shift();
+
+        // Opacity based on position relative to solid sections
+        const sectionAlpha = getCometSectionOpacity(cy);
+        const fadeIn = Math.min(scrollProgress * 12, 1);
+        const masterAlpha = sectionAlpha * fadeIn;
+
+        if (masterAlpha < 0.01) return;
+
+        cCtx.globalAlpha = masterAlpha;
+
+        // --- Draw trail ---
+        for (let i = 1; i < trail.length; i++) {
+          const t = i / trail.length;
+          const prev = trail[i - 1];
+          const curr = trail[i];
+          const alpha = t * t * 0.55;
+          const width = 1 + t * 4.5;
+
+          // Blue-purple gradient along trail
+          const r = Math.round(80 + 30 * t);
+          const g = Math.round(75 + 70 * t);
+          const b = Math.round(220 + 32 * (1 - t));
+
+          cCtx.beginPath();
+          cCtx.moveTo(prev.x, prev.y);
+          cCtx.lineTo(curr.x, curr.y);
+          cCtx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
+          cCtx.lineWidth = width;
+          cCtx.lineCap = 'round';
+          cCtx.stroke();
+        }
+
+        // --- Emit stardust particles ---
+        emitStardust(cx, cy, speed);
+        updateAndDrawStardust(cCtx, masterAlpha);
+
+        // --- Energy ring around comet head ---
+        ringAngle += 0.035;
+        const ringPulse = 0.7 + 0.3 * Math.sin(Date.now() * 0.004);
+        const ringSize = (14 + 6 * ringPulse) * (1 + speed * 8);
+        const ringTilt = 0.35 + 0.1 * Math.sin(Date.now() * 0.002);
+        const ringAlpha = (0.2 + 0.15 * ringPulse) * masterAlpha;
+
+        cCtx.save();
+        cCtx.translate(cx, cy);
+        cCtx.rotate(ringAngle);
+        cCtx.scale(1, ringTilt);
+        // Outer ring
+        cCtx.beginPath();
+        cCtx.arc(0, 0, ringSize, 0, Math.PI * 2);
+        cCtx.strokeStyle = `rgba(130, 120, 255, ${ringAlpha})`;
+        cCtx.lineWidth = 1.5;
+        cCtx.stroke();
+        // Inner faint ring
+        cCtx.beginPath();
+        cCtx.arc(0, 0, ringSize * 0.65, 0, Math.PI * 2);
+        cCtx.strokeStyle = `rgba(180, 170, 255, ${ringAlpha * 0.4})`;
+        cCtx.lineWidth = 0.8;
+        cCtx.stroke();
+        cCtx.restore();
+
+        // --- Comet head glow (outer) ---
+        const g1 = cCtx.createRadialGradient(cx, cy, 0, cx, cy, 32);
+        g1.addColorStop(0, 'rgba(110,100,252,0.5)');
+        g1.addColorStop(0.35, 'rgba(79,142,247,0.18)');
+        g1.addColorStop(1, 'rgba(79,142,247,0)');
+        cCtx.beginPath();
+        cCtx.arc(cx, cy, 32, 0, Math.PI * 2);
+        cCtx.fillStyle = g1;
+        cCtx.fill();
+
+        // --- Comet head core ---
+        const g2 = cCtx.createRadialGradient(cx, cy, 0, cx, cy, 6);
+        g2.addColorStop(0, 'rgba(255,255,255,0.97)');
+        g2.addColorStop(0.45, 'rgba(175,165,255,0.65)');
+        g2.addColorStop(1, 'rgba(110,100,252,0)');
+        cCtx.beginPath();
+        cCtx.arc(cx, cy, 6, 0, Math.PI * 2);
+        cCtx.fillStyle = g2;
+        cCtx.fill();
+
+        cCtx.globalAlpha = 1;
+      }
+
+      // Run comet in its own rAF (separate from stars/planets for independence)
+      function cometLoop() {
+        drawComet();
+        requestAnimationFrame(cometLoop);
+      }
+      cometLoop();
+    })();
+  </script>
+</body>
+</html>

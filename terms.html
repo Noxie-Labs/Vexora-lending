@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — Vexora</title>
+  <meta name="description" content="Vexora Terms of Service. Rules governing your use of Vexora.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B0D12'/%3E%3Cpath d='M8 9l8 14 8-14' stroke='%232FAE7A' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* CSS Variables */
+    :root {
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --color-green: #2FAE7A;
+      --color-green-hover: #28996c;
+      --color-violet: #6D5DFC;
+      --color-blue: #4F8EF7;
+      --color-orange: #F0975A;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+      --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 16px; --radius-2xl: 20px; --radius-full: 9999px;
+      --header-height: 72px; --content-max-width: 1080px; --content-narrow: 800px; --content-narrowest: 680px;
+      --transition-fast: 150ms ease; --transition-base: 250ms ease;
+    }
+    
+    [data-theme="dark"] {
+      --bg-primary: #0B0D12; --bg-secondary: #0E1016; --surface: #15171F; --surface-hover: #1A1D26; --surface-border: rgba(255,255,255,0.06);
+      --text-primary: #F0F0F0; --text-secondary: rgba(240,240,240,0.75); --text-tertiary: rgba(240,240,240,0.6); --text-muted: rgba(240,240,240,0.5); --text-faint: rgba(240,240,240,0.4);
+      --header-bg: rgba(11,13,18,0.7); --header-bg-scrolled: rgba(11,13,18,0.95); --toggle-hover: rgba(255,255,255,0.06); --footer-border: rgba(255,255,255,0.06);
+      --btn-primary-bg: var(--color-green); --btn-primary-text: #ffffff; --btn-secondary-border: rgba(255,255,255,0.15); --btn-secondary-text: var(--text-primary);
+    }
+    
+    [data-theme="light"] {
+      --bg-primary: #FAFAF8; --bg-secondary: #F7F7F5; --surface: #FFFFFF; --surface-hover: #F5F5F3; --surface-border: rgba(0,0,0,0.08);
+      --text-primary: #1A1A1A; --text-secondary: rgba(26,26,26,0.75); --text-tertiary: rgba(26,26,26,0.6); --text-muted: rgba(26,26,26,0.5); --text-faint: rgba(26,26,26,0.4);
+      --header-bg: rgba(250,250,248,0.7); --header-bg-scrolled: rgba(250,250,248,0.95); --toggle-hover: rgba(0,0,0,0.04); --footer-border: rgba(0,0,0,0.08);
+      --btn-primary-bg: var(--color-green); --btn-primary-text: #ffffff; --btn-secondary-border: rgba(0,0,0,0.15); --btn-secondary-text: var(--text-primary);
+    }
+
+    /* Reset and Base Styles */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      transition: background-color var(--transition-base), color var(--transition-base);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Header Component */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-height);
+      background-color: var(--header-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color var(--transition-base), border-bottom var(--transition-base);
+      border-bottom: 1px solid transparent;
+    }
+    .header.scrolled {
+      background-color: var(--header-bg-scrolled);
+      border-bottom: 1px solid var(--surface-border);
+    }
+    .header-content {
+      width: 100%;
+      max-width: var(--content-max-width);
+      padding: 0 var(--space-xl);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+    }
+    .logo-text {
+      background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      background: transparent;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+    }
+    .theme-toggle:hover {
+      background-color: var(--toggle-hover);
+      color: var(--text-primary);
+    }
+    .theme-toggle svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    [data-theme="dark"] .icon-sun { display: none; }
+    [data-theme="light"] .icon-moon { display: none; }
+    
+    /* Layout */
+    .main-content {
+      flex: 1;
+      padding-top: calc(var(--header-height) + var(--space-3xl));
+      padding-bottom: var(--space-3xl);
+      display: flex;
+      justify-content: center;
+    }
+    
+    .legal-container {
+      width: 100%;
+      max-width: var(--content-narrowest);
+      padding: 0 var(--space-xl);
+    }
+
+    /* Legal Typography */
+    .legal-container h1 {
+      font-size: 40px;
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+    .legal-container .effective-date {
+      font-size: 14px;
+      opacity: 0.5;
+      margin-bottom: var(--space-2xl);
+    }
+    .legal-container h2 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-top: 40px;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+    .legal-container p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-md);
+    }
+    .legal-container ul {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-md);
+      margin-left: var(--space-xl);
+    }
+    .legal-container li {
+      margin-bottom: var(--space-sm);
+    }
+    .legal-container a {
+      color: var(--color-green);
+      transition: text-decoration var(--transition-fast);
+    }
+    .legal-container a:hover {
+      text-decoration: underline;
+    }
+    .legal-container strong {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--footer-border);
+      padding: var(--space-2xl) 0;
+      margin-top: auto;
+    }
+    .footer-content {
+      max-width: var(--content-max-width);
+      margin: 0 auto;
+      padding: 0 var(--space-xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
+    }
+    .footer-top {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .footer-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-xl);
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+    .footer-link {
+      transition: color var(--transition-fast);
+    }
+    .footer-link:hover {
+      color: var(--text-primary);
+    }
+    .follow-trigger {
+      position: relative;
+      cursor: pointer;
+    }
+    .follow-popup {
+      position: absolute;
+      bottom: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background-color: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-fast);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 140px;
+      z-index: 50;
+    }
+    .follow-trigger:hover .follow-popup,
+    .follow-popup:hover {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+    .popup-link {
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color var(--transition-fast);
+    }
+    .popup-link:hover {
+      background-color: var(--surface-hover);
+    }
+    .popup-link svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    @media (max-width: 768px) {
+      .legal-container h1 {
+        font-size: 32px;
+      }
+      .legal-container h2 {
+        font-size: 20px;
+        margin-top: 32px;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+    }
+    .header__logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .header__logo-icon-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(47, 174, 122, 0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(47, 174, 122, 0.18);
+      overflow: hidden;
+      transition: background var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
+    }
+
+    .header__logo:hover .header__logo-icon-wrap {
+      background: rgba(47, 174, 122, 0.18);
+      border-color: rgba(47, 174, 122, 0.3);
+      transform: scale(1.05);
+    }
+
+    .header__logo-icon {
+      width: 100%;
+      height: 100%;
+      padding: 4px;
+      box-sizing: border-box;
+      object-fit: contain;
+    }
+
+    .header__logo-text {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      transition: color var(--transition-base);
+    }
+
+    [data-theme="light"] .header__logo-icon-wrap {
+      background: rgba(47, 174, 122, 0.1);
+      border-color: rgba(47, 174, 122, 0.2);
+    }
+  </style>
+</head>
+<body>
+  
+  <header class="header" id="header">
+    <div class="header-content">
+      <a href="./index.html" class="header__logo">
+        <span class="header__logo-icon-wrap">
+          <img src="logo.png" alt="Vexora V logo" class="header__logo-icon">
+        </span>
+        <span class="header__logo-text">Vexora</span>
+      </a>
+      
+      <div class="header-actions">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <article class="legal-container">
+      <h1>Terms of Service</h1>
+      <div class="effective-date"><strong>Effective Date:</strong> August 9, 2026</div>
+
+      <p>Welcome to Vexora. By accessing or using our website and services, you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not access or use our services.</p>
+
+      <h2>1. Product Development Status and Pre-Orders</h2>
+      <p>Vexora is currently in active development. Purchases made before the official launch are pre-orders: you are securing access at founding-member pricing to a product that is not yet fully built. We will make reasonable efforts to deliver the features described on our website within the estimated timeframe communicated at the time of purchase, but delivery dates are estimates, not guarantees, and features may change during development.</p>
+
+      <h2>2. Refunds and Cancellations</h2>
+      <p>If you pre-ordered and the product has not yet launched, you are entitled to a full refund at any time before launch, no questions asked — simply contact us at <a href="mailto:noxielabs@gmail.com">noxielabs@gmail.com</a>. Once the product has launched and been delivered to you, refund requests are handled on a case-by-case basis; contact us and we will do our best to find a fair resolution.</p>
+
+      <h2>3. Eligibility and Age Requirements</h2>
+      <p>Our services are not directed at children under the age of 13 (or the applicable minimum age in your jurisdiction). By using our services, you confirm that you meet this minimum age requirement, or that you have obtained the consent of a parent or legal guardian.</p>
+
+      <h2>4. AI-Generated Content Disclaimer</h2>
+      <p>Translations, extracted text, and AI Assist responses are generated using automated AI systems and on-device OCR. While we aim for accuracy, this content may occasionally contain errors, omissions, or inaccuracies. You should not rely on AI-generated output for critical, legal, medical, financial, or safety-related decisions.</p>
+
+      <h2>5. Acceptable Use</h2>
+      <p>You agree to use our services only for lawful purposes and in accordance with these Terms. You strictly agree not to:</p>
+      <ul>
+        <li>Use the service in any way that violates any applicable local, national, or international law or regulation.</li>
+        <li>Engage in any unauthorized scraping, data mining, or extraction activities.</li>
+        <li>Transmit any malicious code, viruses, or harmful software.</li>
+        <li>Attempt to gain unauthorized access to our systems, user accounts, or networks.</li>
+      </ul>
+
+      <h2>6. Intellectual Property Rights</h2>
+      <p>The services and all original content, features, and functionality are and will remain the exclusive property of Vexora and its licensors. All intellectual property rights are reserved. You may not copy, modify, distribute, sell, or lease any part of our services or included software without explicit written permission from us.</p>
+
+      <h2>7. Disclaimer of Warranties</h2>
+      <p>YOUR USE OF THE SERVICE IS AT YOUR SOLE RISK. THE SERVICE IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS. NOXIE LABS EXPRESSLY DISCLAIMS ALL WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
+
+      <h2>8. Limitation of Liability</h2>
+      <p>To the maximum extent permitted by applicable law, in no event shall Vexora, its directors, employees, partners, or affiliates be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from:</p>
+      <ul>
+        <li>Your access to or use of or inability to access or use the service;</li>
+        <li>Any conduct or content of any third party on the service;</li>
+        <li>Any unauthorized access, use, or alteration of your transmissions or content.</li>
+      </ul>
+
+      <h2>9. Account and Service Termination</h2>
+      <p>We may terminate or suspend your account and bar access to the service immediately, without prior notice or liability, under our sole discretion, for any reason whatsoever, including without limitation a breach of these Terms. Upon termination, your right to use the service will immediately cease.</p>
+
+      <h2>10. Governing Law</h2>
+      <p>These Terms shall be governed and construed in accordance with the laws of Ukraine, specifically focusing on the jurisdiction of the Lviv region (Drohobych), without regard to its conflict of law provisions. Any legal actions or proceedings arising out of or relating to these Terms shall be brought exclusively in the competent courts located in Ukraine.</p>
+
+      <h2>11. Contact Information</h2>
+      <p>If you have any questions about these Terms, please contact us at:</p>
+      <p>
+        <strong>Vexora</strong><br>
+        Lviv Region, Ukraine<br>
+        Email: <a href="mailto:noxielabs@gmail.com">noxielabs@gmail.com</a>
+      </p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-top">
+        <a href="./index.html" class="logo">
+          <img src="./logo.png" alt="Vexora logo" style="width: 28px; height: 28px; object-fit: contain;">
+          <span class="logo-text">Vexora</span>
+        </a>
+      </div>
+      <div class="footer-bottom">
+        <div>&copy; 2026 Vexora. All rights reserved.</div>
+        <div class="footer-links">
+          <a href="./privacy.html" class="footer-link">Privacy</a>
+          <a href="./terms.html" class="footer-link">Terms</a>
+          <a href="https://tally.so/r/rjQXMv" class="footer-link" target="_blank" rel="noopener">Got feedback?</a>
+          <div class="follow-trigger">
+            <span class="footer-link">Follow</span>
+            <div class="follow-popup">
+              <a href="https://x.com/noxielabs" class="popup-link" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.054 10.054 0 01-3.127 1.195 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                Twitter (X)
+              </a>
+              <a href="https://t.me/noxielabs" class="popup-link" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.18 3.44-.49.33-.94.5-1.35.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.32-.47.88-.71 3.44-1.5 5.73-2.49 6.87-2.96 3.26-1.36 3.94-1.6 4.38-1.6.1 0 .31.02.43.1.1.07.13.15.15.24 0 .04.01.12.01.2z"/></svg>
+                Telegram
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const getStoredTheme = () => localStorage.getItem('vexora-theme');
+    const setStoredTheme = theme => localStorage.setItem('vexora-theme', theme);
+    
+    const getPreferredTheme = () => {
+      const storedTheme = getStoredTheme();
+      if (storedTheme) {
+        return storedTheme;
+      }
+      return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    };
+    
+    const setTheme = theme => {
+      document.documentElement.setAttribute('data-theme', theme);
+    };
+    
+    setTheme(getPreferredTheme());
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      setTheme(newTheme);
+      setStoredTheme(newTheme);
+    });
+
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 10) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+  </script>
+</body>
+</html>

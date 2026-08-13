@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Vexora</title>
+  <meta name="description" content="Vexora Privacy Policy. How we collect, use, and protect your data.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B0D12'/%3E%3Cpath d='M8 9l8 14 8-14' stroke='%232FAE7A' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --color-green: #2FAE7A;
+      --color-green-hover: #28996c;
+      --color-violet: #6D5DFC;
+      --color-blue: #4F8EF7;
+      --color-orange: #F0975A;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+      --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 16px; --radius-2xl: 20px; --radius-full: 9999px;
+      --header-height: 72px; --content-max-width: 1080px; --content-narrow: 800px; --content-narrowest: 680px;
+      --transition-fast: 150ms ease; --transition-base: 250ms ease;
+    }
+    
+    [data-theme="dark"] {
+      --bg-primary: #0B0D12; --bg-secondary: #0E1016; --surface: #15171F; --surface-hover: #1A1D26; --surface-border: rgba(255,255,255,0.06);
+      --text-primary: #F0F0F0; --text-secondary: rgba(240,240,240,0.75); --text-tertiary: rgba(240,240,240,0.6); --text-muted: rgba(240,240,240,0.5); --text-faint: rgba(240,240,240,0.4);
+      --header-bg: rgba(11,13,18,0.7); --header-bg-scrolled: rgba(11,13,18,0.95); --toggle-hover: rgba(255,255,255,0.06); --footer-border: rgba(255,255,255,0.06);
+      --btn-primary-bg: var(--color-green); --btn-primary-text: #ffffff; --btn-secondary-border: rgba(255,255,255,0.15); --btn-secondary-text: var(--text-primary);
+    }
+    
+    [data-theme="light"] {
+      --bg-primary: #FAFAF8; --bg-secondary: #F7F7F5; --surface: #FFFFFF; --surface-hover: #F5F5F3; --surface-border: rgba(0,0,0,0.08);
+      --text-primary: #1A1A1A; --text-secondary: rgba(26,26,26,0.75); --text-tertiary: rgba(26,26,26,0.6); --text-muted: rgba(26,26,26,0.5); --text-faint: rgba(26,26,26,0.4);
+      --header-bg: rgba(250,250,248,0.7); --header-bg-scrolled: rgba(250,250,248,0.95); --toggle-hover: rgba(0,0,0,0.04); --footer-border: rgba(0,0,0,0.08);
+      --btn-primary-bg: var(--color-green); --btn-primary-text: #ffffff; --btn-secondary-border: rgba(0,0,0,0.15); --btn-secondary-text: var(--text-primary);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      transition: background-color var(--transition-base), color var(--transition-base);
+    }
+
+    /* Header */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--header-height);
+      background: var(--header-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--surface-border);
+      z-index: 100;
+      transition: background var(--transition-base);
+    }
+    
+    .nav-container {
+      max-width: var(--content-max-width);
+      margin: 0 auto;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-lg);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition-fast);
+    }
+    
+    .theme-toggle:hover {
+      background: var(--toggle-hover);
+    }
+    
+    [data-theme="dark"] .moon-icon { display: none; }
+    [data-theme="light"] .sun-icon { display: none; }
+
+    /* Main Content Layout */
+    .legal-content {
+      max-width: var(--content-narrowest);
+      margin: 0 auto;
+      padding: calc(var(--header-height) + var(--space-3xl)) var(--space-lg) var(--space-3xl);
+    }
+
+    /* Typography & Markdown Styles */
+    .legal-content h1 {
+      font-size: 40px;
+      font-weight: 700;
+      margin-bottom: var(--space-sm); /* 8px */
+      line-height: 1.2;
+    }
+
+    .legal-content .effective-date {
+      font-size: 14px;
+      opacity: 0.5;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .legal-content h2 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-top: 40px;
+      margin-bottom: 12px;
+    }
+
+    .legal-content p,
+    .legal-content ul,
+    .legal-content li {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      opacity: 0.8;
+    }
+
+    .legal-content p {
+      margin-bottom: var(--space-md);
+    }
+
+    .legal-content ul {
+      margin-left: var(--space-xl);
+      margin-bottom: var(--space-lg);
+    }
+
+    .legal-content li {
+      margin-bottom: var(--space-sm);
+    }
+
+    .legal-content a {
+      color: var(--color-green);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+    
+    .legal-content a:hover {
+      text-decoration: underline;
+    }
+
+    .legal-content strong {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--footer-border);
+      padding: var(--space-2xl) 0;
+      margin-top: var(--space-3xl);
+    }
+    
+    .footer-container {
+      max-width: var(--content-max-width);
+      margin: 0 auto;
+      padding: 0 var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+    
+    @media (min-width: 768px) {
+      .footer-container {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .footer-brand .logo svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .copyright {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+
+    .footer-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .follow-wrapper {
+      position: relative;
+    }
+
+    .follow-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .follow-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .follow-popup {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) 0;
+      min-width: 120px;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+    
+    .follow-popup.active {
+      display: flex;
+    }
+
+    .follow-popup a {
+      padding: var(--space-sm) var(--space-md);
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    
+    .follow-popup a:hover {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+    }
+    .header__logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .header__logo-icon-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(47, 174, 122, 0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(47, 174, 122, 0.18);
+      overflow: hidden;
+      transition: background var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
+    }
+
+    .header__logo:hover .header__logo-icon-wrap {
+      background: rgba(47, 174, 122, 0.18);
+      border-color: rgba(47, 174, 122, 0.3);
+      transform: scale(1.05);
+    }
+
+    .header__logo-icon {
+      width: 100%;
+      height: 100%;
+      padding: 4px;
+      box-sizing: border-box;
+      object-fit: contain;
+    }
+
+    .header__logo-text {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      transition: color var(--transition-base);
+    }
+
+    [data-theme="light"] .header__logo-icon-wrap {
+      background: rgba(47, 174, 122, 0.1);
+      border-color: rgba(47, 174, 122, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <header id="header">
+    <div class="nav-container">
+      <a href="./index.html" class="header__logo">
+        <span class="header__logo-icon-wrap">
+          <img src="logo.png" alt="Vexora V logo" class="header__logo-icon">
+        </span>
+        <span class="header__logo-text">Vexora</span>
+      </a>
+      
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="legal-content">
+    <h1>Privacy Policy</h1>
+    <p class="effective-date"><strong>Effective Date:</strong> August 9, 2026</p>
+
+    <p>Welcome to Vexora. Vexora ("we", "us", or "our") respects your privacy and is committed to protecting your personal data. This Privacy Policy explains how we collect, use, and safeguard your information when you visit our website or use our services.</p>
+
+    <h2>1. Information We Collect</h2>
+    <p>We routinely collect the following types of information:</p>
+    <ul>
+      <li><strong>Personal Data:</strong> Information you provide to us directly, such as your name, email address, and any details submitted through our contact forms.</li>
+      <li><strong>Usage Data & Analytics:</strong> Automated, anonymized information regarding how you access and use our website, collected via privacy-focused, cookieless analytics (Plausible). We do not use tracking or advertising cookies.</li>
+      <li><strong>Screen Content You Choose to Process:</strong> When you use the app's translation, extraction, or AI Assist features, text is extracted from your selected screen area using on-device (local) OCR. This extracted text — not a screenshot or image — may then be sent to our third-party AI processing partner (Anthropic) solely to generate the translation, extracted text output, or assistance you requested. This data is not used to train AI models and is not retained by us beyond what is necessary to process your request.</li>
+      <li><strong>Your Own API Key (BYOK):</strong> If you choose to connect your own AI provider API key in the app's settings, your requests are sent directly from your device to that provider and do not pass through our servers or systems at all. In that case, that provider's own privacy policy governs how your data is handled.</li>
+    </ul>
+
+    <h2>2. How We Use Your Information</h2>
+    <p>We use the collected data for various purposes, including:</p>
+    <ul>
+      <li>Providing, maintaining, and improving our services.</li>
+      <li>Responding to your inquiries and support requests.</li>
+      <li>Monitoring usage and analyzing trends to enhance user experience.</li>
+      <li>Ensuring compliance with our legal obligations and protecting against malicious activities.</li>
+    </ul>
+
+    <h2>3. Data Sharing and Disclosure</h2>
+    <p>We do not sell your personal data. We share information only with the following categories of trusted third-party service providers, solely to operate our business, each bound by their own confidentiality and data protection obligations:</p>
+    <ul>
+      <li><strong>Lemon Squeezy</strong> — our payment processor and Merchant of Record. All payment card data is handled entirely by Lemon Squeezy; we never see or store your full card details.</li>
+      <li><strong>Anthropic</strong> — our AI processing partner, used to generate translations and AI Assist responses from text you choose to process (see Section 1). Not used if you connect your own API key (BYOK).</li>
+      <li><strong>Plausible Analytics</strong> — cookieless, privacy-focused website analytics.</li>
+      <li>Our email service provider — used only to send account, purchase, and (if you opt in) product update communications.</li>
+    </ul>
+
+    <h2>4. Your Rights (GDPR & CCPA Compliance)</h2>
+    <p>Depending on your location, you have specific rights regarding your personal data under the General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA):</p>
+    <ul>
+      <li><strong>Right to Access:</strong> You may request a copy of the personal data we hold about you.</li>
+      <li><strong>Right to Correction:</strong> You may ask us to correct any inaccurate or incomplete data.</li>
+      <li><strong>Right to Deletion (Right to be Forgotten):</strong> You can request that we erase your personal data, subject to certain legal exceptions.</li>
+      <li><strong>Right to Restrict or Object to Processing:</strong> You may ask us to limit how we use your data, or object to certain processing activities.</li>
+      <li><strong>Right to Data Portability:</strong> You may request your data in a structured, commonly used format to transfer to another provider.</li>
+    </ul>
+
+    <p><strong>How to Exercise Your Rights:</strong><br>
+    To submit a privacy request regarding data access, correction, or deletion, please contact us at <a href="mailto:noxielabs@gmail.com">noxielabs@gmail.com</a>. We will respond to your request within the timeframe required by applicable law.</p>
+
+    <h2>5. Children's Privacy</h2>
+    <p>Our services are not directed at children under the age of 13 (or the applicable minimum age in your jurisdiction), and we do not knowingly collect personal data from children under that age. If you believe a child has provided us with personal data, please contact us at <a href="mailto:noxielabs@gmail.com">noxielabs@gmail.com</a> and we will take steps to delete it.</p>
+
+    <h2>6. Contact Us</h2>
+    <p>If you have any questions or concerns about this Privacy Policy, please contact us at:</p>
+
+    <p><strong>Vexora</strong><br>
+    Lviv Region, Ukraine<br>
+    Email: <a href="mailto:noxielabs@gmail.com">noxielabs@gmail.com</a></p>
+  </main>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-brand">
+        <a href="./index.html" class="logo" style="margin-bottom: 0;">
+          <img src="./logo.png" alt="Vexora logo" style="width: 28px; height: 28px; object-fit: contain;">
+        </a>
+        <span class="copyright">&copy; 2026 Vexora. All rights reserved.</span>
+      </div>
+      <div class="footer-links">
+        <a href="./privacy.html">Privacy</a>
+        <a href="./terms.html">Terms</a>
+        <a href="https://tally.so/r/rjQXMv">Got feedback?</a>
+        <div class="follow-wrapper">
+          <button class="follow-btn" id="followBtn">
+            Follow
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="follow-popup" id="followPopup">
+            <a href="https://x.com/noxielabs" target="_blank" rel="noopener">Twitter / X</a>
+            <a href="https://t.me/noxielabs" target="_blank" rel="noopener">Telegram</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Theme Management
+    const themeToggle = document.getElementById('themeToggle');
+    const THEME_KEY = 'vexora-theme';
+    
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem(THEME_KEY, theme);
+    }
+    
+    function initTheme() {
+      const savedTheme = localStorage.getItem(THEME_KEY);
+      if (savedTheme) {
+        setTheme(savedTheme);
+      } else {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(prefersDark ? 'dark' : 'light');
+      }
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+    
+    initTheme();
+
+    // Footer Follow Popup
+    const followBtn = document.getElementById('followBtn');
+    const followPopup = document.getElementById('followPopup');
+
+    followBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      followPopup.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!followPopup.contains(e.target) && !followBtn.contains(e.target)) {
+        followPopup.classList.remove('active');
+      }
+    });
+
+    // Header scroll background effect
+    window.addEventListener('scroll', () => {
+      const header = document.getElementById('header');
+      if (window.scrollY > 10) {
+        header.style.backgroundColor = 'var(--header-bg-scrolled)';
+      } else {
+        header.style.backgroundColor = 'var(--header-bg)';
+      }
+    });
+  </script>
+</body>
+</html>
