@@ -10,7 +10,7 @@
   <meta property="og:title" content="Vexora — Live Game Translation & AI Screen Assistant">
   <meta property="og:description" content="Live translation overlay for games. One hotkey, zero tab-switching. Works on Windows & Mac.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://noxielabs.space/vexora/">
+  <meta property="og:url" content="https://noxielabs.space/">
   <meta property="og:image" content="">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -29,15 +29,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="/vexora/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
 </head>
 <body>
 
   <!-- ========== HEADER ========== -->
   <header class="header" id="header">
-    <a href="/vexora/" class="header__logo">
+    <a href="/" class="header__logo">
       <span class="header__logo-icon-wrap">
-        <img src="/vexora/assets/images/logo.png" alt="Vexora V logo" class="header__logo-icon">
+        <img src="/assets/images/logo.png" alt="Vexora V logo" class="header__logo-icon">
       </span>
       <span class="header__logo-text">Vexora</span>
     </a>
@@ -350,14 +350,17 @@
   <!-- ========== SECTION 7: FINAL CTA ========== -->
   <section class="section" id="final-cta">
     <canvas class="stars-canvas" id="cta-stars"></canvas>
-    <div class="container container--cta" style="position: relative; z-index: 2;">
-      <h2 class="cta__title">Ready to stop guessing what they're saying?</h2>
+    <!-- Додано flexbox для центрування та прибрано зайвий верхній відступ -->
+    <div class="container container--cta" style="position: relative; z-index: 2; padding-top: 0; display: flex; flex-direction: column; align-items: center;">
 
-      <a href="https://send.monobank.ua/jar/5jRdB78TKa" class="hero__cta" target="_blank" rel="noopener">Donation</a>
+      <!-- Твоя графічна кнопка -->
+      <a href="https://send.monobank.ua/jar/5jRdB78TKa" target="_blank" rel="noopener" style="display: inline-block; transition: transform 0.3s ease; margin-bottom: 20px;" onmouseenter="this.style.transform='scale(1.05) rotate(-2deg)'" onmouseleave="this.style.transform='scale(1) rotate(0deg)'">
+        <img src="/assets/images/button.svg" alt="Donation" style="max-height: 90px; display: block; filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.4));">
+      </a>
 
       <div class="cta__divider"><span>or</span></div>
 
-      <!-- Email form (inline confirmation, no redirect) -->
+      <!-- Email form -->
       <div id="email-form-wrap">
         <form class="cta__email-form" id="email-form" novalidate>
           <input class="cta__email-input" type="email" name="email" placeholder="you@email.com" required autocomplete="email">
@@ -365,7 +368,6 @@
         </form>
         <p class="cta__email-hint">Not ready to commit? We'll email you when it's live.</p>
       </div>
-
       <p class="cta__preorder-note">Pre-order — Vexora is still in development. Full refund anytime before launch.</p>
     </div>
   </section>
@@ -376,8 +378,8 @@
       <div class="footer__brand">Vexora</div>
       <div class="footer__links">
         <span class="footer__copy">Vexora © 2026</span>
-        <a href="/vexora/pages/privacy.html" class="footer__link">Privacy</a>
-        <a href="/vexora/pages/terms.html" class="footer__link">Terms</a>
+        <a href="/pages/privacy" class="footer__link">Privacy</a>
+        <a href="/pages/terms" class="footer__link">Terms</a>
         <a href="https://tally.so/r/rjQXMv" class="footer__link" id="footer-feedback" target="_blank" rel="noopener">Got feedback?</a>
 
         <!-- Follow popup -->
@@ -1646,7 +1648,7 @@
     }
 
     const planetLogo = new Image();
-    planetLogo.src = '/vexora/assets/images/logo.png';
+    planetLogo.src = '/assets/images/logo.png';
 
     function drawPlanets() {
       if (!planetsCtx) return;
