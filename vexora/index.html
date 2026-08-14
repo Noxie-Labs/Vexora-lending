@@ -1967,12 +1967,13 @@
           const dx = closestTarget.x - cometX;
           const dy = closestTarget.y - cometY;
           
-          if (closestDist > 15) {
-            // Realistic gravitational pull (inverse square-ish)
-            const force = 3000 / (closestDist * closestDist);
-            ax = (dx / closestDist) * force;
-            ay = (dy / closestDist) * force;
-          }
+          // Cap the effective distance to prevent infinite gravity spikes (singularity)
+          // This allows the comet to smoothly "slingshot" past the target instead of getting trapped
+          const effectiveDist = Math.max(closestDist, 60); 
+          const force = 15000 / (effectiveDist * effectiveDist);
+          
+          ax = (dx / closestDist) * force;
+          ay = (dy / closestDist) * force;
         } else {
           // If no gravity target, gently steer towards BASE_ANGLE
           let currentAngle = Math.atan2(cometVy, cometVx);
