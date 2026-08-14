@@ -1852,6 +1852,8 @@
       const MAX_TURN_RATE = 0.02; // How fast it can turn (rad/frame)
       const BASE_ANGLE = Math.PI / 8; // ~22.5 degrees down-right
 
+      const targetCooldowns = new Map();
+
       // Elements that attract the comet
       function getGravityTargets() {
         const selectors = [
@@ -1862,12 +1864,15 @@
           '#planets-canvas'
         ];
         const targets = [];
+        const now = Date.now();
         selectors.forEach(sel => {
           document.querySelectorAll(sel).forEach(el => {
+            // Ignore if recently visited
+            if (targetCooldowns.has(el) && now - targetCooldowns.get(el) < 5000) return;
             const r = el.getBoundingClientRect();
             // Ensure element is actually visible in viewport before attracting
             if (r.width > 0 && r.height > 0) {
-              targets.push({ x: r.left + r.width / 2, y: r.top + window.scrollY + r.height / 2 });
+              targets.push({ el, x: r.left + r.width / 2, y: r.top + window.scrollY + r.height / 2 });
             }
           });
         });
@@ -1964,16 +1969,20 @@
         }
 
         if (closestTarget) {
-          const dx = closestTarget.x - cometX;
-          const dy = closestTarget.y - cometY;
-          
-          // Cap the effective distance to prevent infinite gravity spikes (singularity)
-          // This allows the comet to smoothly "slingshot" past the target instead of getting trapped
-          const effectiveDist = Math.max(closestDist, 60); 
-          const force = 15000 / (effectiveDist * effectiveDist);
-          
-          ax = (dx / closestDist) * force;
-          ay = (dy / closestDist) * force;
+          if (closestDist < 80) {
+            // Reached target! Put on cooldown so it ignores gravity and flies away freely
+            targetCooldowns.set(closestTarget.el, Date.now());
+          } else {
+            const dx = closestTarget.x - cometX;
+            const dy = closestTarget.y - cometY;
+            
+            // Smoother gravity that doesn't oscillate
+            const effectiveDist = Math.max(closestDist, 100); 
+            const force = 4000 / (effectiveDist * effectiveDist);
+            
+            ax = (dx / closestDist) * force;
+            ay = (dy / closestDist) * force;
+          }
         } else {
           // If no gravity target, gently steer towards BASE_ANGLE
           let currentAngle = Math.atan2(cometVy, cometVx);
