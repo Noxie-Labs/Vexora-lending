@@ -976,11 +976,27 @@ body {
 /* =============================================
    FULL-SCREEN DEMO OVERLAY
    ============================================= */
+.demo-overlay-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 1998;
+  background: var(--bg-primary);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0.45s;
+}
+
+.demo-overlay-bg.open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0s;
+}
+
 .demo-overlay {
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: var(--bg-primary);
+  background: transparent;
   display: flex;
   flex-direction: column;
   opacity: 0;
@@ -2155,10 +2171,14 @@ a:active, button:active {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 5;
+}
+
+.comet-canvas.overlay-active {
+  z-index: 1999;
 }
 
 /* Z-index depth layering — comet hides behind content-heavy sections */

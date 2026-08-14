@@ -401,6 +401,7 @@
   </footer>
 
   <!-- ========== FULL-SCREEN DEMO OVERLAY ========== -->
+  <div class="demo-overlay-bg" id="demo-overlay-bg"></div>
   <div class="demo-overlay" id="demo-overlay">
     <div class="demo-overlay__bar">
       <div class="demo-overlay__progress">
@@ -621,16 +622,19 @@
     function openOverlay() {
       overlayOpen = true;
       document.body.style.overflow = 'hidden';
+      document.getElementById('demo-overlay-bg').classList.add('open');
       overlay.classList.add('open');
+      document.getElementById('comet-canvas').classList.add('overlay-active');
       startLevel(1);
     }
 
     function closeOverlay() {
       overlayOpen = false;
+      document.getElementById('demo-overlay-bg').classList.remove('open');
       overlay.classList.remove('open');
+      document.getElementById('comet-canvas').classList.remove('overlay-active');
       document.body.style.overflow = '';
       stopTranslateLoop();
-      stopDemoComet();
       // Scroll back to the Try Product button
       setTimeout(() => {
         const btn = document.getElementById('try-product-btn');
@@ -659,8 +663,7 @@
       if (num === 1) { startLevel1(); }
       else if (num === 2) { initLevel2(); levels[1].classList.add('active'); }
       else if (num === 3) { initLevel3(); levels[2].classList.add('active'); }
-
-      // Start the demo comet guide for this level
+      
       startDemoComet(num);
     }
 
@@ -723,6 +726,7 @@
     const olHotkeyInd = document.getElementById('ol-hotkey-indicator');
     const olTranslateCaption = document.getElementById('ol-translate-caption');
     let level1Triggered = false;
+    let level1Ready = false;
 
     function olRenderChars(text, className) {
       olTranslateEl.innerHTML = '';
@@ -768,6 +772,7 @@
     function startLevel1() {
       levels[0].classList.add('active');
       level1Triggered = false;
+      level1Ready = false;
       olTranslateCaption.classList.remove('visible');
       olHotkeyInd.classList.remove('visible', 'pressed');
 
@@ -775,15 +780,17 @@
       
       const GIBBERISH_SEQ = ["&#^#&^$&#^$&^", "@#&^@##&@^$#&", "@($*(@*#&@(*&#*"];
       playLevel1Seq(GIBBERISH_SEQ, 0, () => {
-        translateLoopTimer = setTimeout(() => olHotkeyInd.classList.add('visible'), 600);
+        translateLoopTimer = setTimeout(() => {
+          olHotkeyInd.classList.add('visible');
+          level1Ready = true;
+        }, 600);
       });
     }
 
     // User clicks the hotkey indicator to trigger translation
     olHotkeyInd.addEventListener('click', () => {
-      if (currentLevel !== 1 || level1Triggered || !overlayOpen) return;
+      if (currentLevel !== 1 || level1Triggered || !overlayOpen || !level1Ready) return;
       level1Triggered = true;
-      stopDemoComet(); // stop the comet orbiting
       runTranslateOnce();
     });
 
@@ -1050,62 +1057,19 @@
       let path = { x: dcW / 2, y: dcH / 2 };
 
       if (level === 1) {
-        // Orbit around the hotkey indicator button
         targetEl = document.getElementById('ol-hotkey-indicator');
-        if (targetEl) {
-          const r = targetEl.getBoundingClientRect();
-          const overlayR = demoCometCanvas.getBoundingClientRect();
-          const cx = r.left - overlayR.left + r.width / 2;
-          const cy = r.top - overlayR.top + r.height / 2;
-          const rx = r.width * 1.1 + 30;
-          const ry = r.height * 0.8 + 20;
-          const angle = t * 1.8; // orbit speed
-          path = {
-            x: cx + Math.cos(angle) * rx,
-            y: cy + Math.sin(angle) * ry,
-          };
-        }
       } else if (level === 2) {
-        // Sweep around the extract text block in a rounded rectangle path
         targetEl = document.getElementById('ol-extract-lines');
-        if (targetEl) {
-          const r = targetEl.getBoundingClientRect();
-          const overlayR = demoCometCanvas.getBoundingClientRect();
-          const cx = r.left - overlayR.left + r.width / 2;
-          const cy = r.top - overlayR.top + r.height / 2;
-          const hw = r.width / 2 + 28;
-          const hh = r.height / 2 + 22;
-          // Parameterized rounded rectangle
-          const p = (t * 0.8) % (Math.PI * 2);
-          const cornerR = 20;
-          // Use superellipse for rounded rect feel
-          const n = 3.5; // roundedness (higher = more rectangular)
-          const cosP = Math.cos(p);
-          const sinP = Math.sin(p);
-          const sgnCos = Math.sign(cosP);
-          const sgnSin = Math.sign(sinP);
-          path = {
-            x: cx + sgnCos * hw * Math.pow(Math.abs(cosP), 2 / n),
-            y: cy + sgnSin * hh * Math.pow(Math.abs(sinP), 2 / n),
-          };
-        }
       } else if (level === 3) {
-        // Figure-8 zigzag through glitched blocks
         targetEl = document.getElementById('ol-assist-blocks');
-        if (targetEl) {
-          const r = targetEl.getBoundingClientRect();
-          const overlayR = demoCometCanvas.getBoundingClientRect();
-          const cx = r.left - overlayR.left + r.width / 2;
-          const cy = r.top - overlayR.top + r.height / 2;
-          const hw = r.width / 2 + 20;
-          const hh = r.height / 2 + 16;
-          // Lissajous figure-8
-          const speed = t * 1.2;
-          path = {
-            x: cx + Math.sin(speed) * hw,
-            y: cy + Math.sin(speed * 2) * hh * 0.6,
-          };
-        }
+      }
+      
+      if (targetEl) {
+        const r = targetEl.getBoundingClientRect();
+        const overlayR = demoCometCanvas.getBoundingClientRect();
+        const cx = r.left - overlayR.left + r.width / 2;
+        const cy = r.top - overlayR.top + r.height / 2;
+        path = { x: cx, y: cy };
       }
 
       return path;
@@ -1138,13 +1102,11 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, dcW, dcH);
 
-      // Fade in
       demoCometAlpha = Math.min(demoCometAlpha + 0.025, 1.0);
-      demoCometTime += 0.016; // ~60fps time step
+      demoCometTime += 0.016; 
 
       const pos = getDemoCometPos(demoCometLevel, demoCometTime);
 
-      // Update trail
       demoCometTrail.push({ x: pos.x, y: pos.y });
       if (demoCometTrail.length > DEMO_TRAIL_LEN) demoCometTrail.shift();
 
@@ -1856,15 +1818,23 @@
 
       // Elements that attract the comet
       function getGravityTargets() {
-        const selectors = [
-          '#hero-demo-btn', 
-          '#try-product-btn', 
-          '#header-demo-btn',
-          '.pricing-card__btn',
-          '#planets-canvas'
-        ];
+        const overlay = document.getElementById('demo-overlay');
+        const isOverlayOpen = overlay && overlay.classList.contains('open');
+
         const targets = [];
         const now = Date.now();
+        
+        const selectors = [];
+        if (isOverlayOpen) {
+          // If overlay is open, only attract to active demo elements
+          selectors.push('.demo-overlay__level.active #ol-hotkey-indicator');
+          selectors.push('.demo-overlay__level.active #ol-extract-lines');
+          selectors.push('.demo-overlay__level.active #ol-assist-blocks');
+        } else {
+          // Normal background elements
+          selectors.push('#hero-demo-btn', '#try-product-btn', '#header-demo-btn', '.pricing-card__btn', '#planets-canvas');
+        }
+
         selectors.forEach(sel => {
           document.querySelectorAll(sel).forEach(el => {
             // Ignore if recently visited
