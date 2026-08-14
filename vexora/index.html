@@ -665,7 +665,6 @@
 
     function transitionToLevel(nextNum) {
       stopTranslateLoop();
-      stopDemoComet();
       const isFinish = nextNum > 3;
       transitionText.textContent = isFinish ? 'All Levels Complete!' : 'Level Complete!';
       transitionSub.textContent = isFinish ? 'Great job!' : 'Moving to next level...';
