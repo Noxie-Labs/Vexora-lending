@@ -1829,7 +1829,7 @@
       const cCtx = cCanvas.getContext('2d');
       let cW = 0, cH = 0;
       const trail = [];
-      const TRAIL_LEN = 55;
+      const TRAIL_LEN = 75;
 
       function resizeComet() {
         const dpr = window.devicePixelRatio || 1;
@@ -1845,11 +1845,11 @@
       /* ---- Comet Physics State ---- */
       let cometX = -100;
       let cometY = Math.random() * cH;
-      let cometVx = 3;
-      let cometVy = 1.5;
-      const COMET_SPEED = 4.5;
+      let cometVx = 2.0;
+      let cometVy = 1.0;
+      const COMET_SPEED = 3.0;
       const GRAVITY_RADIUS = 350; // Distance to feel pull
-      const MAX_TURN_RATE = 0.025; // How fast it can turn (rad/frame)
+      const MAX_TURN_RATE = 0.02; // How fast it can turn (rad/frame)
       const BASE_ANGLE = Math.PI / 8; // ~22.5 degrees down-right
 
       // Elements that attract the comet
@@ -1891,7 +1891,7 @@
             vx: Math.cos(angle) * drift - (cometVx * 0.15),
             vy: Math.sin(angle) * drift - (cometVy * 0.15),
             life: 1.0,
-            decay: 0.012 + Math.random() * 0.015,
+            decay: 0.009 + Math.random() * 0.012,
             size: 1.0 + Math.random() * 2.2,
             hue: 230 + Math.random() * 40, // blue-purple range
           });
