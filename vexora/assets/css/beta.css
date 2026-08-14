@@ -478,23 +478,24 @@ body {
   max-width: 650px;
   width: 100%;
   margin-top: 40px;
-  background: #181825;
-  border: 1px solid #313244;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
   border-radius: 16px;
   padding: 32px;
+  transition: background var(--transition-base), border-color var(--transition-base);
 }
 
 .beta-validation__heading {
   font-size: 20px;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary);
   margin-bottom: 14px;
 }
 
 .beta-validation__body {
   font-size: 15px;
   line-height: 1.7;
-  color: rgba(240, 240, 240, 0.68);
+  color: var(--text-secondary);
   margin-bottom: 28px;
 }
 
