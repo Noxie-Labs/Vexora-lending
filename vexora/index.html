@@ -1844,7 +1844,7 @@
 
       /* ---- Comet Physics State ---- */
       let cometX = -100;
-      let cometY = Math.random() * cH;
+      let cometY = (window.scrollY || 0) + Math.random() * cH;
       let cometVx = 2.0;
       let cometVy = 1.0;
       const COMET_SPEED = 3.0;
@@ -1867,7 +1867,7 @@
             const r = el.getBoundingClientRect();
             // Ensure element is actually visible in viewport before attracting
             if (r.width > 0 && r.height > 0) {
-              targets.push({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+              targets.push({ x: r.left + r.width / 2, y: r.top + window.scrollY + r.height / 2 });
             }
           });
         });
@@ -1933,7 +1933,16 @@
       let frameCount = 0;
 
       function drawComet() {
+        const scrollY = window.scrollY;
+        
+        // Reset transform to clear the whole fixed canvas
+        const dpr = window.devicePixelRatio || 1;
+        cCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         cCtx.clearRect(0, 0, cW, cH);
+        
+        // Apply camera offset so the comet lives in absolute document space
+        cCtx.translate(0, -scrollY);
+
         frameCount++;
 
         // 1. Update Physics
@@ -1987,10 +1996,12 @@
         // Screen wrapping with trail clearing
         const PAD = 150;
         let wrapped = false;
-        if (cometX > cW + PAD) { cometX = -PAD; cometY = Math.random() * cH; wrapped = true; }
-        else if (cometX < -PAD) { cometX = cW + PAD; cometY = Math.random() * cH; wrapped = true; }
-        else if (cometY > cH + PAD) { cometY = -PAD; cometX = Math.random() * cW; wrapped = true; }
-        else if (cometY < -PAD) { cometY = cH + PAD; cometX = Math.random() * cW; wrapped = true; }
+        
+        if (cometX > cW + PAD) { cometX = -PAD; cometY = scrollY + Math.random() * cH; wrapped = true; }
+        else if (cometX < -PAD) { cometX = cW + PAD; cometY = scrollY + Math.random() * cH; wrapped = true; }
+        
+        if (cometY > scrollY + cH + PAD) { cometY = scrollY - PAD; cometX = Math.random() * cW; wrapped = true; }
+        else if (cometY < scrollY - PAD) { cometY = scrollY + cH + PAD; cometX = Math.random() * cW; wrapped = true; }
         
         if (wrapped) {
           trail.length = 0; // Clear trail so it doesn't streak across screen
