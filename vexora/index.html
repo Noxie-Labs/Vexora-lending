@@ -1821,7 +1821,7 @@
     mainLoop();
 
     /* =============================================
-       INTERACTIVE COMET — scroll-driven
+       INTERACTIVE COMET — Autonomous & Gravity-Driven
        ============================================= */
     (function initComet() {
       const cCanvas = document.getElementById('comet-canvas');
@@ -1842,62 +1842,45 @@
       resizeComet();
       window.addEventListener('resize', resizeComet);
 
-      // Catmull-Rom spline for smooth path
-      function catmullRom(p0, p1, p2, p3, t) {
-        const t2 = t * t, t3 = t2 * t;
-        return 0.5 * ((2*p1) + (-p0+p2)*t + (2*p0-5*p1+4*p2-p3)*t2 + (-p0+3*p1-3*p2+p3)*t3);
+      /* ---- Comet Physics State ---- */
+      let cometX = -100;
+      let cometY = Math.random() * cH;
+      let cometVx = 3;
+      let cometVy = 1.5;
+      const COMET_SPEED = 4.5;
+      const GRAVITY_RADIUS = 350; // Distance to feel pull
+      const MAX_TURN_RATE = 0.025; // How fast it can turn (rad/frame)
+      const BASE_ANGLE = Math.PI / 8; // ~22.5 degrees down-right
+
+      // Elements that attract the comet
+      function getGravityTargets() {
+        const selectors = [
+          '#hero-demo-btn', 
+          '#try-product-btn', 
+          '#header-demo-btn',
+          '.pricing-card__btn',
+          '#planets-canvas'
+        ];
+        const targets = [];
+        selectors.forEach(sel => {
+          document.querySelectorAll(sel).forEach(el => {
+            const r = el.getBoundingClientRect();
+            // Ensure element is actually visible in viewport before attracting
+            if (r.width > 0 && r.height > 0) {
+              targets.push({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+            }
+          });
+        });
+        return targets;
       }
-
-      function splinePoint(pts, t) {
-        const n = pts.length - 1;
-        const seg = Math.min(Math.floor(t * n), n - 1);
-        const lt = t * n - seg;
-        const i0 = Math.max(seg - 1, 0);
-        const i1 = seg;
-        const i2 = Math.min(seg + 1, n);
-        const i3 = Math.min(seg + 2, n);
-        return {
-          x: catmullRom(pts[i0].x, pts[i1].x, pts[i2].x, pts[i3].x, lt),
-          y: catmullRom(pts[i0].y, pts[i1].y, pts[i2].y, pts[i3].y, lt),
-        };
-      }
-
-      // Waypoints as viewport fractions
-      const WAYPOINTS = [
-        { x: 0.50, y: 0.48 },
-        { x: 0.62, y: 0.22 },
-        { x: 0.82, y: 0.38 },
-        { x: 0.72, y: 0.62 },
-        { x: 0.35, y: 0.40 },
-        { x: 0.18, y: 0.58 },
-        { x: 0.38, y: 0.32 },
-        { x: 0.75, y: 0.52 },
-        { x: 0.60, y: 0.68 },
-        { x: 0.50, y: 0.45 },
-      ];
-
-      /* ---- Inertia-based scroll physics ---- */
-      let scrollProgress = 0;    // smoothed value used for rendering
-      let scrollVelocity = 0;    // current velocity (rad/frame equivalent)
-      let targetProgress = 0;    // raw scroll target
-      let prevTarget = 0;        // previous frame's target (for velocity calc)
-      const SCROLL_STIFFNESS = 0.045;  // spring pull toward target
-      const SCROLL_DAMPING   = 0.82;   // velocity decay (lower = more glide)
-      let cometVisible = false;
-
-      window.addEventListener('scroll', () => {
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        targetProgress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
-        cometVisible = window.scrollY > 80;
-      }, { passive: true });
 
       /* ---- Stardust particle system ---- */
       const stardustParticles = [];
       const MAX_STARDUST = 80;
 
-      function emitStardust(cx, cy, speed) {
-        // Emit 1-3 particles per frame depending on speed
-        const count = Math.min(3, Math.max(1, Math.round(speed * 120)));
+      function emitStardust(cx, cy) {
+        // Emit 1-2 particles per frame
+        const count = Math.random() < 0.6 ? 1 : 2;
         for (let i = 0; i < count; i++) {
           if (stardustParticles.length >= MAX_STARDUST) break;
           const angle = Math.random() * Math.PI * 2;
@@ -1905,8 +1888,8 @@
           stardustParticles.push({
             x: cx + (Math.random() - 0.5) * 8,
             y: cy + (Math.random() - 0.5) * 8,
-            vx: Math.cos(angle) * drift - speed * 40,
-            vy: Math.sin(angle) * drift,
+            vx: Math.cos(angle) * drift - (cometVx * 0.15),
+            vy: Math.sin(angle) * drift - (cometVy * 0.15),
             life: 1.0,
             decay: 0.012 + Math.random() * 0.015,
             size: 1.0 + Math.random() * 2.2,
@@ -1945,50 +1928,83 @@
         }
       }
 
-      // Check if comet overlaps a solid section (for opacity)
-      function getCometSectionOpacity(screenY) {
-        const ids = ['pain', 'demo', 'how-it-works', 'privacy-trust', 'pricing'];
-        for (const id of ids) {
-          const el = document.getElementById(id);
-          if (!el) continue;
-          const r = el.getBoundingClientRect();
-          if (screenY > r.top + 30 && screenY < r.bottom - 30) return 0.08;
-        }
-        return 1.0;
-      }
-
       /* ---- Energy ring state ---- */
       let ringAngle = 0;
+      let frameCount = 0;
 
       function drawComet() {
-        /* ---- Inertia scroll physics ---- */
-        // Compute velocity from target change + spring force
-        const springForce = (targetProgress - scrollProgress) * SCROLL_STIFFNESS;
-        scrollVelocity += springForce;
-        scrollVelocity *= SCROLL_DAMPING;
-        scrollProgress += scrollVelocity;
-        // Clamp
-        scrollProgress = Math.max(0, Math.min(1, scrollProgress));
-        const speed = Math.abs(scrollVelocity);
-
         cCtx.clearRect(0, 0, cW, cH);
+        frameCount++;
 
-        if (!cometVisible && scrollProgress < 0.01) return;
+        // 1. Update Physics
+        let currentAngle = Math.atan2(cometVy, cometVx);
+        let targetAngle = currentAngle;
 
-        const pos = splinePoint(WAYPOINTS, Math.min(scrollProgress, 0.999));
-        const cx = pos.x * cW;
-        const cy = pos.y * cH;
+        // Calculate gravity every few frames to save performance
+        const targets = getGravityTargets();
+        let closestDist = Infinity;
+        let closestTarget = null;
+        
+        for (let t of targets) {
+          const dx = t.x - cometX;
+          const dy = t.y - cometY;
+          const dist = Math.hypot(dx, dy);
+          if (dist < GRAVITY_RADIUS && dist < closestDist) {
+            closestDist = dist;
+            closestTarget = t;
+          }
+        }
 
-        // Update trail
-        trail.push({ x: cx, y: cy });
+        if (closestTarget) {
+          // Attract towards the target
+          const desiredAngle = Math.atan2(closestTarget.y - cometY, closestTarget.x - cometX);
+          
+          let angleDiff = desiredAngle - currentAngle;
+          while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+          while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+          
+          targetAngle = currentAngle + Math.max(-MAX_TURN_RATE, Math.min(MAX_TURN_RATE, angleDiff));
+        } else {
+          // Return towards base angle if drifting too far off
+          let angleDiff = BASE_ANGLE - currentAngle;
+          while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+          while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+          
+          if (Math.abs(angleDiff) > Math.PI / 4) {
+             targetAngle = currentAngle + Math.max(-MAX_TURN_RATE * 0.4, Math.min(MAX_TURN_RATE * 0.4, angleDiff));
+          } else {
+             // Gentle organic wobble
+             targetAngle += (Math.sin(frameCount * 0.05) * 0.005);
+          }
+        }
+
+        cometVx = Math.cos(targetAngle) * COMET_SPEED;
+        cometVy = Math.sin(targetAngle) * COMET_SPEED;
+        
+        cometX += cometVx;
+        cometY += cometVy;
+
+        // Screen wrapping with trail clearing
+        const PAD = 150;
+        let wrapped = false;
+        if (cometX > cW + PAD) { cometX = -PAD; cometY = Math.random() * cH; wrapped = true; }
+        else if (cometX < -PAD) { cometX = cW + PAD; cometY = Math.random() * cH; wrapped = true; }
+        else if (cometY > cH + PAD) { cometY = -PAD; cometX = Math.random() * cW; wrapped = true; }
+        else if (cometY < -PAD) { cometY = cH + PAD; cometX = Math.random() * cW; wrapped = true; }
+        
+        if (wrapped) {
+          trail.length = 0; // Clear trail so it doesn't streak across screen
+          // Assign random base velocity for variety upon respawn
+          const newAngle = BASE_ANGLE + (Math.random() - 0.5) * 0.5;
+          cometVx = Math.cos(newAngle) * COMET_SPEED;
+          cometVy = Math.sin(newAngle) * COMET_SPEED;
+        }
+
+        // 2. Rendering
+        trail.push({ x: cometX, y: cometY });
         if (trail.length > TRAIL_LEN) trail.shift();
 
-        // Opacity based on position relative to solid sections
-        const sectionAlpha = getCometSectionOpacity(cy);
-        const fadeIn = Math.min(scrollProgress * 12, 1);
-        const masterAlpha = sectionAlpha * fadeIn;
-
-        if (masterAlpha < 0.01) return;
+        const masterAlpha = 0.9; // Constant bright opacity
 
         cCtx.globalAlpha = masterAlpha;
 
@@ -1997,7 +2013,7 @@
           const t = i / trail.length;
           const prev = trail[i - 1];
           const curr = trail[i];
-          const alpha = t * t * 0.55;
+          const alpha = t * t * 0.6;
           const width = 1 + t * 4.5;
 
           // Blue-purple gradient along trail
@@ -2015,18 +2031,18 @@
         }
 
         // --- Emit stardust particles ---
-        emitStardust(cx, cy, speed);
+        emitStardust(cometX, cometY);
         updateAndDrawStardust(cCtx, masterAlpha);
 
         // --- Energy ring around comet head ---
         ringAngle += 0.035;
         const ringPulse = 0.7 + 0.3 * Math.sin(Date.now() * 0.004);
-        const ringSize = (14 + 6 * ringPulse) * (1 + speed * 8);
+        const ringSize = 14 + 6 * ringPulse;
         const ringTilt = 0.35 + 0.1 * Math.sin(Date.now() * 0.002);
-        const ringAlpha = (0.2 + 0.15 * ringPulse) * masterAlpha;
+        const ringAlpha = (0.25 + 0.15 * ringPulse) * masterAlpha;
 
         cCtx.save();
-        cCtx.translate(cx, cy);
+        cCtx.translate(cometX, cometY);
         cCtx.rotate(ringAngle);
         cCtx.scale(1, ringTilt);
         // Outer ring
@@ -2038,35 +2054,35 @@
         // Inner faint ring
         cCtx.beginPath();
         cCtx.arc(0, 0, ringSize * 0.65, 0, Math.PI * 2);
-        cCtx.strokeStyle = `rgba(180, 170, 255, ${ringAlpha * 0.4})`;
+        cCtx.strokeStyle = `rgba(180, 170, 255, ${ringAlpha * 0.5})`;
         cCtx.lineWidth = 0.8;
         cCtx.stroke();
         cCtx.restore();
 
         // --- Comet head glow (outer) ---
-        const g1 = cCtx.createRadialGradient(cx, cy, 0, cx, cy, 32);
-        g1.addColorStop(0, 'rgba(110,100,252,0.5)');
-        g1.addColorStop(0.35, 'rgba(79,142,247,0.18)');
+        const g1 = cCtx.createRadialGradient(cometX, cometY, 0, cometX, cometY, 32);
+        g1.addColorStop(0, 'rgba(110,100,252,0.6)');
+        g1.addColorStop(0.35, 'rgba(79,142,247,0.22)');
         g1.addColorStop(1, 'rgba(79,142,247,0)');
         cCtx.beginPath();
-        cCtx.arc(cx, cy, 32, 0, Math.PI * 2);
+        cCtx.arc(cometX, cometY, 32, 0, Math.PI * 2);
         cCtx.fillStyle = g1;
         cCtx.fill();
 
         // --- Comet head core ---
-        const g2 = cCtx.createRadialGradient(cx, cy, 0, cx, cy, 6);
-        g2.addColorStop(0, 'rgba(255,255,255,0.97)');
-        g2.addColorStop(0.45, 'rgba(175,165,255,0.65)');
+        const g2 = cCtx.createRadialGradient(cometX, cometY, 0, cometX, cometY, 6);
+        g2.addColorStop(0, 'rgba(255,255,255,0.98)');
+        g2.addColorStop(0.45, 'rgba(175,165,255,0.7)');
         g2.addColorStop(1, 'rgba(110,100,252,0)');
         cCtx.beginPath();
-        cCtx.arc(cx, cy, 6, 0, Math.PI * 2);
+        cCtx.arc(cometX, cometY, 6, 0, Math.PI * 2);
         cCtx.fillStyle = g2;
         cCtx.fill();
 
         cCtx.globalAlpha = 1;
       }
 
-      // Run comet in its own rAF (separate from stars/planets for independence)
+      // Run comet in its own rAF
       function cometLoop() {
         drawComet();
         requestAnimationFrame(cometLoop);
