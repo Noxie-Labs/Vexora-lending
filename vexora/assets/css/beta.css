@@ -499,7 +499,7 @@ body {
   margin-bottom: 28px;
 }
 
-/* Email form — matches index.html */
+/* Email form | matches index.html */
 .cta__email-form {
   display: flex;
   gap: var(--space-sm);

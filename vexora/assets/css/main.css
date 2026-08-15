@@ -1,5 +1,5 @@
 /* =============================================
-   DESIGN TOKENS — from design-brief.md
+   DESIGN TOKENS | from design-brief.md
    ============================================= */
 
 :root {
@@ -287,7 +287,7 @@ body {
 }
 
 /* =============================================
-   SECTIONS — SKELETON CONTAINERS
+   SECTIONS | SKELETON CONTAINERS
    ============================================= */
 
 .section {
@@ -295,7 +295,7 @@ body {
   transition: background-color var(--transition-base);
 }
 
-/* Section dev outline — remove when adding content */
+/* Section dev outline | remove when adding content */
 .section__placeholder {
   display: flex;
   align-items: center;
@@ -341,7 +341,7 @@ body {
   will-change: transform;
 }
 
-/* Shape 1 — large green circle, top-right */
+/* Shape 1 | large green circle, top-right */
 .hero__shape--1 {
   width: 420px;
   height: 420px;
@@ -352,7 +352,7 @@ body {
   filter: blur(60px);
 }
 
-/* Shape 2 — medium violet polygon, top-right offset */
+/* Shape 2 | medium violet polygon, top-right offset */
 .hero__shape--2 {
   width: 280px;
   height: 280px;
@@ -364,7 +364,7 @@ body {
   border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
 }
 
-/* Shape 3 — large green-blue, bottom-left */
+/* Shape 3 | large green-blue, bottom-left */
 .hero__shape--3 {
   width: 360px;
   height: 360px;
@@ -376,7 +376,7 @@ body {
   border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%;
 }
 
-/* Shape 4 — small violet accent, bottom-left offset */
+/* Shape 4 | small violet accent, bottom-left offset */
 .hero__shape--4 {
   width: 200px;
   height: 200px;
@@ -1075,7 +1075,7 @@ body {
   height: 18px;
 }
 
-/* Overlay body — level container */
+/* Overlay body | level container */
 .demo-overlay__body {
   flex: 1;
   display: flex;
@@ -2181,7 +2181,7 @@ a:active, button:active {
   z-index: 1999;
 }
 
-/* Z-index depth layering — comet hides behind content-heavy sections */
+/* Z-index depth layering | comet hides behind content-heavy sections */
 #pain, #demo, #pricing {
   position: relative;
   z-index: 10;
@@ -2207,7 +2207,7 @@ a:active, button:active {
 }
 
 /* =============================================
-   RESPONSIVE — PLANET CAROUSEL
+   RESPONSIVE | PLANET CAROUSEL
    ============================================= */
 @media (max-width: 768px) {
   .hero__planets-wrap {
